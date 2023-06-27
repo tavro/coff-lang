@@ -1,5 +1,6 @@
+#line 1 "scanner.cc"
 
-#line 2 "lex.yy.c"
+#line 3 "scanner.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -373,8 +374,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 4
-#define YY_END_OF_BUFFER 5
+#define YY_NUM_RULES 5
+#define YY_END_OF_BUFFER 6
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -382,10 +383,10 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[12] =
+static const flex_int16_t yy_accept[13] =
     {   0,
-        0,    0,    5,    4,    3,    1,    4,    0,    0,    2,
-        0
+        0,    0,    6,    5,    4,    2,    1,    5,    0,    0,
+        3,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -394,7 +395,7 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    4,    1,    1,    1,
+        1,    1,    1,    1,    1,    4,    5,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -420,39 +421,39 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[5] =
+static const YY_CHAR yy_meta[6] =
     {   0,
-        1,    1,    1,    2
+        1,    1,    1,    1,    2
     } ;
 
-static const flex_int16_t yy_base[14] =
+static const flex_int16_t yy_base[15] =
     {   0,
-        0,    0,   10,   11,   11,   11,    0,    6,    5,   11,
-       11,    5,    4
+        0,    0,   11,   12,   12,   12,   12,    0,    7,    6,
+       12,   12,    6,    5
     } ;
 
-static const flex_int16_t yy_def[14] =
+static const flex_int16_t yy_def[15] =
     {   0,
-       11,    1,   11,   11,   11,   11,   12,   13,   13,   11,
-        0,   11,   11
+       12,    1,   12,   12,   12,   12,   12,   13,   14,   14,
+       12,    0,   12,   12
     } ;
 
-static const flex_int16_t yy_nxt[16] =
+static const flex_int16_t yy_nxt[18] =
     {   0,
-        4,    5,    6,    7,    9,    9,    8,   10,   10,   11,
-        3,   11,   11,   11,   11
+        4,    5,    6,    7,    8,   10,   10,    9,   11,   11,
+       12,    3,   12,   12,   12,   12,   12
     } ;
 
-static const flex_int16_t yy_chk[16] =
+static const flex_int16_t yy_chk[18] =
     {   0,
-        1,    1,    1,    1,   13,   13,   12,    9,    8,    3,
-       11,   11,   11,   11,   11
+        1,    1,    1,    1,    1,   14,   14,   13,   10,    9,
+        3,   12,   12,   12,   12,   12,   12
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[5] =
+static const flex_int32_t yy_rule_can_match_eol[6] =
     {   0,
-1, 0, 0, 0,     };
+0, 1, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -475,10 +476,12 @@ char *yytext;
 
 int column = 0;
 
-#line 478 "lex.yy.c"
+extern YYLTYPE yylloc;
+
+#line 481 "scanner.cc"
 /* flex declarations */
 /* code */
-#line 481 "lex.yy.c"
+#line 484 "scanner.cc"
 
 #define INITIAL 0
 
@@ -695,10 +698,10 @@ YY_DECL
 		}
 
 	{
-#line 21 "coff.lex"
+#line 24 "coff.lex"
 
 
-#line 701 "lex.yy.c"
+#line 704 "scanner.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -725,13 +728,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 12 )
+				if ( yy_current_state >= 13 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 11 );
+		while ( yy_base[yy_current_state] != 12 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -766,38 +769,48 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
-/* rule 1 can match eol */
 YY_RULE_SETUP
-#line 23 "coff.lex"
+#line 26 "coff.lex"
+{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				// TODO: return T_DOT;
+			}
+	YY_BREAK
+case 2:
+/* rule 2 can match eol */
+YY_RULE_SETUP
+#line 33 "coff.lex"
 {
 				column = 0;
 			}
 	YY_BREAK
-case 2:
+case 3:
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 27 "coff.lex"
+#line 37 "coff.lex"
 column = 0; /* skip single line comment */
 	YY_BREAK
-case 3:
+case 4:
 YY_RULE_SETUP
-#line 29 "coff.lex"
+#line 39 "coff.lex"
 {
 				column++;
 			}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 33 "coff.lex"
+#line 43 "coff.lex"
 yyterminate();
 	YY_BREAK
-case 4:
+case 5:
 YY_RULE_SETUP
-#line 35 "coff.lex"
+#line 45 "coff.lex"
 ECHO;
 	YY_BREAK
-#line 800 "lex.yy.c"
+#line 813 "scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1092,7 +1105,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 12 )
+			if ( yy_current_state >= 13 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1120,11 +1133,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 12 )
+		if ( yy_current_state >= 13 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 11);
+	yy_is_jam = (yy_current_state == 12);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1812,5 +1825,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 35 "coff.lex"
+#line 45 "coff.lex"
 
