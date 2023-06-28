@@ -279,6 +279,60 @@ public:
     */
     void print(int);
 
+    /* 
+    returns pool_index (or 0) given symbol table index 
+    */
+    sym_index get_symbol_id(const sym_index);
+
+    /* 
+    returns type given symbol table index 
+    */
+    sym_index get_symbol_type(const sym_index);
+
+    /* 
+    returns tag type given symbol table index 
+    */
+    sym_type get_symbol_tag(const sym_index);
+
+    /*
+    sets symbol type given symbol table index
+    */
+    void set_symbol_type(const sym_index, const sym_index);
+
+    long get_next_label();
+
+    // TODO: write description for this
+    sym_index gen_temp_var(sym_index);
+
+    /* functions for entering ids depending on context */
+    // TODO: write descriptions for these
+    sym_index enter_constant (position_information *,
+                              const pool_index,
+                              const sym_index,
+                              const long);
+
+    sym_index enter_constant (position_information *,
+                              const pool_index,
+                              const sym_index,
+                              const double);
+    
+    sym_index enter_function (position_information *,
+                              const pool_index);
+
+    sym_index enter_parameter(position_information *,
+                              const pool_index,
+                              const sym_index);
+
+    /* display methods */
+
+    /*
+    returns symbol table index to current environment, i.e. function
+    */
+    sym_index current_environment();
+
+    // TODO: write descriptions for these
+    void open_scope();
+    sym_index close_scope();
 };
 
 #endif
