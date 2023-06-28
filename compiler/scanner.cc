@@ -551,15 +551,16 @@ char *yytext;
 #line 2 "coff.lex"
 
 #include "scanner.hh"
+#include "symtab.hh"
 
 int column = 0;
 
-extern YYLTYPE yylloc;
+extern YYLTYPE yylloc; // position information
 
-#line 559 "scanner.cc"
+#line 560 "scanner.cc"
 /* flex declarations */
 /* code */
-#line 562 "scanner.cc"
+#line 563 "scanner.cc"
 
 #define INITIAL 0
 
@@ -776,10 +777,10 @@ YY_DECL
 		}
 
 	{
-#line 24 "coff.lex"
+#line 25 "coff.lex"
 
 
-#line 782 "scanner.cc"
+#line 783 "scanner.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -848,237 +849,237 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 26 "coff.lex"
+#line 27 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_DOT;
+				return T_DOT;
 			}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 33 "coff.lex"
+#line 34 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_SEMICOLON;
+				return T_SEMICOLON;
 			}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 40 "coff.lex"
+#line 41 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_EQ;
+				return T_EQ;
 			}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 47 "coff.lex"
+#line 48 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_COLON;
+				return T_COLON;
 			}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 54 "coff.lex"
+#line 55 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_LEFTPAR;	
+				return T_LEFTPAR;	
 			}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 61 "coff.lex"
+#line 62 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_RIGHTPAR;
+				return T_RIGHTPAR;
 			}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 68 "coff.lex"
+#line 69 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_LEFTBRACKET;	
+				return T_LEFTBRACKET;	
 			}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 75 "coff.lex"
+#line 76 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_RIGHTBRACKET;
+				return T_RIGHTBRACKET;
 			}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 82 "coff.lex"
+#line 83 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_COMMA;
+				return T_COMMA;
 			}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 89 "coff.lex"
+#line 90 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_LESSTHAN;
+				return T_LESSTHAN;
 			}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 96 "coff.lex"
+#line 97 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_GREATERTHAN;
+				return T_GREATERTHAN;
 			}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 103 "coff.lex"
+#line 104 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_ADD;
+				return T_ADD;
 			}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 110 "coff.lex"
+#line 111 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_SUB;
+				return T_SUB;
 			}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 117 "coff.lex"
+#line 118 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_MULT;
+				return T_MULT;
 			}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 124 "coff.lex"
+#line 125 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_DIV;
+				return T_DIV;
 			}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 131 "coff.lex"
+#line 132 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_IF
+				return T_IF
 			}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 138 "coff.lex"
+#line 139 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_ELSE
+				return T_ELSE
 			}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 145 "coff.lex"
+#line 146 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_ELSEIF
+				return T_ELSEIF
 			}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 152 "coff.lex"
+#line 153 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_CONST
+				return T_CONST
 			}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 159 "coff.lex"
+#line 160 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_WHILE
+				return T_WHILE
 			}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 166 "coff.lex"
+#line 167 "coff.lex"
 {
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				// TODO: return T_RETURN
+				return T_RETURN
 			}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 173 "coff.lex"
+#line 174 "coff.lex"
 {
 					yylloc.first_line = yylineno;
 					yylloc.first_column = column;
 					column += yyleng;
-					// TODO: return T_PROGRAM
+					return T_PROGRAM
 			 	}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 180 "coff.lex"
+#line 181 "coff.lex"
 {
 					yylloc.first_line = yylineno;
 					yylloc.first_column = column;
 					column += yyleng;
-					// TODO: return T_FUNCTION
+					return T_FUNCTION
 				}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 187 "coff.lex"
+#line 188 "coff.lex"
 {
 				yylloc.first_line = yylineno;
                 yylloc.first_column = column;
@@ -1090,14 +1091,14 @@ YY_RULE_SETUP
                 if(value == LONG_MAX && errno == ERANGE)
                     yyerror("Integer out of range");
                 yylval.ival = value;
+				*/
 
                 return T_INT;
-				*/
 			}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 203 "coff.lex"
+#line 204 "coff.lex"
 {
 				yylloc.first_line = yylineno;
                 yylloc.first_column = column;
@@ -1107,13 +1108,14 @@ YY_RULE_SETUP
 				TODO:
 				char *ptr;
                 yylval.rval = strtod(yytext, &ptr);
-            	return T_REAL;
 				*/
+
+            	return T_REAL;
 			}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 216 "coff.lex"
+#line 218 "coff.lex"
 {
 				yylloc.first_line = yylineno;
                 yylloc.first_column = column;
@@ -1122,13 +1124,14 @@ YY_RULE_SETUP
 				/*
 				TODO:
                 yylval.pool_p = sym_tab->pool_install(sym_tab->capitalize(yytext));
-                return T_ID;
 				*/
+				
+                return T_ID;
 			}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 228 "coff.lex"
+#line 231 "coff.lex"
 {
 				yylloc.first_line = yylineno;
                 yylloc.first_column = column;
@@ -1137,14 +1140,15 @@ YY_RULE_SETUP
 				/*
 				TODO:
 				yylval.str = sym_tab->pool_install(sym_tab->fix_string(yytext));
-                return T_STRING;
 				*/
+
+                return T_STRING;
 			}
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 240 "coff.lex"
+#line 244 "coff.lex"
 {
 				column = 0;
 			}
@@ -1154,26 +1158,26 @@ case 29:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 244 "coff.lex"
+#line 248 "coff.lex"
 column = 0; /* skip single line comment */
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 246 "coff.lex"
+#line 250 "coff.lex"
 {
 				column++;
 			}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 250 "coff.lex"
+#line 254 "coff.lex"
 yyterminate();
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 252 "coff.lex"
+#line 256 "coff.lex"
 ECHO;
 	YY_BREAK
-#line 1176 "scanner.cc"
+#line 1180 "scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2188,5 +2192,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 252 "coff.lex"
+#line 256 "coff.lex"
 

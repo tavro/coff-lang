@@ -1,6 +1,8 @@
 #ifndef __SYMTAB_HH__
 #define __SYMTAB_HH__
 
+#include "error.hh"
+
 /* to make code more readable */
 typedef long pool_index;
 typedef long hash_index;
