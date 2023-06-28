@@ -52,9 +52,9 @@
 
 `<factor> ::= <identifier> | <literal> | ( <expression> ) | <method call>`
 
-`<addop> ::= + | - | ADD | SUB`
+`<addop> ::= + | -`
 
-`<mulop> ::= * | / | % | MULT | DIV | MOD`
+`<mulop> ::= * | / | %`
 
 `<identifier> ::= <letter> | <identifier> <letter or digit>`
 
