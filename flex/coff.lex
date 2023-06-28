@@ -128,6 +128,115 @@ STR			'([^'\n]|'')*'
 				// TODO: return T_DIV;
 			}
 
+(?i:if)		{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				// TODO: return T_IF
+			}
+
+(?i:else)	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				// TODO: return T_ELSE
+			}
+
+(?i:elseif)	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				// TODO: return T_ELSEIF
+			}
+
+(?i:const)	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				// TODO: return T_CONST
+			}
+
+(?i:while)	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				// TODO: return T_WHILE
+			}
+
+(?i:return)	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				// TODO: return T_RETURN
+			}
+
+(?i:program) 	{
+					yylloc.first_line = yylineno;
+					yylloc.first_column = column;
+					column += yyleng;
+					// TODO: return T_PROGRAM
+			 	}
+
+(?i:function)	{
+					yylloc.first_line = yylineno;
+					yylloc.first_column = column;
+					column += yyleng;
+					// TODO: return T_FUNCTION
+				}
+
+{DIGIT}+	{
+				yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+
+				/* 
+				TODO:            
+                long value = strtol(yytext, 0, 10);
+                if(value == LONG_MAX && errno == ERANGE)
+                    yyerror("Integer out of range");
+                yylval.ival = value;
+
+                return T_INT;
+				*/
+			}
+
+{REAL}		{
+				yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                
+				/*
+				TODO:
+				char *ptr;
+                yylval.rval = strtod(yytext, &ptr);
+            	return T_REAL;
+				*/
+			}
+
+{ID}+		{
+				yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+
+				/*
+				TODO:
+                yylval.pool_p = sym_tab->pool_install(sym_tab->capitalize(yytext));
+                return T_ID;
+				*/
+			}
+
+{STR}		{
+				yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+
+				/*
+				TODO:
+				yylval.str = sym_tab->pool_install(sym_tab->fix_string(yytext));
+                return T_STRING;
+				*/
+			}
+
 "\n"		{
 				column = 0;
 			}
