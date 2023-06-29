@@ -52,7 +52,7 @@ void symbol::print(ostream &o) {
                     o << "SYM_FUNC ";
                     break;
             }
-            
+
             o << endl;
             break;
         case SUMMARY:
@@ -143,7 +143,7 @@ void function_symbol::print(ostream &o) {
     symbol::print(o);
 
     switch(output_format) {
-        case LONG:
+        case LONG: {
             o << " class:       function_symbol" << endl;
             o << " ar_size:     " << ar_size << endl;
             o << " label_nr:    " << label_nr << endl;
@@ -175,14 +175,17 @@ void function_symbol::print(ostream &o) {
                 }
             }
 
-            o << ") returns " << sym_tab->get_symbol(type);
+            o << ") returns " << sym_tab->get_symbol(type)
               << summary_symbols;
             break;
-        case SHORT:
+        } 
+        case SHORT: {
             break;
-        default:
+        }
+        default: {
             fatal("Bad output format in function_symbol::print()");
             break;
+        }
     }
 }
 

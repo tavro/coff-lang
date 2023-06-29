@@ -32,8 +32,8 @@ symbol_table::symbol_table() {
     string_pool[0] = '\0';
 
     /* init hash table */
-    hash_table = new sym_index[MAX_HASH];
-    for(int i = 0; i < MAX_HASH; i++) {
+    hash_table = new sym_index[HASH_SIZE];
+    for(int i = 0; i < HASH_SIZE; i++) {
         hash_table[i] = NULL_SYM;
     }
 
@@ -82,7 +82,7 @@ long symbol_table::get_next_label() {
 
 // TODO: Write desc
 sym_index symbol_table::gen_temp_var(sym_index type) {
-    string name = "$" + to_string(++symtab->temp_nr);
+    string name = "$" + to_string(++sym_tab->temp_nr);
 
     // TODO: this is just me being lazy, fix this
     if (to_string(sym_tab->temp_nr).length() == 2) {
@@ -95,9 +95,10 @@ sym_index symbol_table::gen_temp_var(sym_index type) {
     pool_index pool_p = pool_install((char*)name.c_str());
 
     if (type == int_type) {
-        return enter_variable(pool_p, int_type);
+        // COMMENT: forgot this wasnt implemented yet
+        // TODO: return enter_variable(pool_p, int_type);
     }
-    return enter_variable(pool_p, real_type);
+    // TODO: return enter_variable(pool_p, real_type);
 }
 
 // TODO: get_size() is not implemented
@@ -225,7 +226,7 @@ hash_index symbol_table::hash(const pool_index p) {
 
     // memory leak since s is still allocated
     // delete[] s is not an good idea since s is changed
-    return h % MAX_HASH;
+    return h % HASH_SIZE;
 }
 
 /* display methods */
@@ -353,7 +354,7 @@ sym_index symbol_table::enter_constant(position_information *pos, const pool_ind
 }
 
 //TODO: write description
-sym_index symbol_table::enter_constant(position_information *pos, const pool_index pool_p, const sym_index type, const long rval) {
+sym_index symbol_table::enter_constant(position_information *pos, const pool_index pool_p, const sym_index type, const double rval) {
     sym_index sym_p = install_symbol(pool_p, SYM_CONST);
     constant_symbol *con = sym_table[sym_p]->get_constant_symbol();
 
@@ -383,7 +384,7 @@ sym_index symbol_table::enter_function(position_information *pos, const pool_ind
     }
 
     func->tag = SYM_FUNC;
-    func->last_parameter = NULL;
+    func->last_param = NULL;
     func->ar_size = 0;
     func->label_nr = get_next_label();
     sym_table[sym_p] = func;

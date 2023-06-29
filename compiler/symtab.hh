@@ -18,6 +18,7 @@ enum symbol_types {
     SYM_FUNC,
     SYM_PARAM,
     SYM_CONST,
+    SYM_UNDEF
 };
 typedef enum symbol_types sym_type;
 
@@ -115,15 +116,15 @@ public:
     symbol(pool_index);
 
     virtual constant_symbol *get_constant_symbol() {
-        // TODO: fatal("Illegal downcasting to constant from symbol class");
+        fatal("Illegal downcasting to constant from symbol class");
         return NULL;
     }
-    virtual constant_symbol *get_parameter_symbol() {
-        // TODO: fatal("Illegal downcasting to parameter from symbol class");
+    virtual parameter_symbol *get_parameter_symbol() {
+        fatal("Illegal downcasting to parameter from symbol class");
         return NULL;
     }
-    virtual constant_symbol *get_function_symbol() {
-        // TODO: fatal("Illegal downcasting to function from symbol class");
+    virtual function_symbol *get_function_symbol() {
+        fatal("Illegal downcasting to function from symbol class");
         return NULL;
     }
 
@@ -194,7 +195,7 @@ ostream &short_symbols(ostream &);
 ostream &summary_symbols(ostream &);
 ostream &long_symbols(ostream &);
 
-friend ostream &operator<<(ostream &, symbol *); // allows to print a node by sending it to outstream
+ostream &operator<<(ostream &, symbol *); // allows to print a node by sending it to outstream
 
 /* 
 ================================

@@ -1,6 +1,8 @@
 #ifndef __SCANNER_HH__
 #define __SCANNER_HH__
 
+#include "symtab.hh"
+
 typedef union {
     long        ival;   // integer value  (T_INTNUM)
     double      rval;   // real value     (T_REALNUM)

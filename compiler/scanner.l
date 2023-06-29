@@ -133,56 +133,56 @@ STR			'([^'\n]|'')*'
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				return T_IF
+				return T_IF;
 			}
 
 (?i:else)	{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				return T_ELSE
+				return T_ELSE;
 			}
 
 (?i:elseif)	{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				return T_ELSEIF
+				return T_ELSEIF;
 			}
 
 (?i:const)	{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				return T_CONST
+				return T_CONST;
 			}
 
 (?i:while)	{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				return T_WHILE
+				return T_WHILE;
 			}
 
 (?i:return)	{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
-				return T_RETURN
+				return T_RETURN;
 			}
 
 (?i:program) 	{
 					yylloc.first_line = yylineno;
 					yylloc.first_column = column;
 					column += yyleng;
-					return T_PROGRAM
+					return T_PROGRAM;
 			 	}
 
 (?i:function)	{
 					yylloc.first_line = yylineno;
 					yylloc.first_column = column;
 					column += yyleng;
-					return T_FUNCTION
+					return T_FUNCTION;
 				}
 
 {DIGIT}+	{
