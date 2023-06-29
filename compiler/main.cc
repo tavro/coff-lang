@@ -19,7 +19,8 @@ void usage(char *program_name) {
          << program_name << " [-flags] <file>\n"
          << program_name << " [-h]\n"
          << "Options:\n"
-         << "  -h: print this help message\n";
+         << "  -h: print this help message\n"
+         << "  -y: print symbol table\n";
     // TODO: add flags
     exit(1);
 }
@@ -30,6 +31,20 @@ int main(int argc, char **argv) {
     bool print_symtab = false;
 
     extern FILE *yyin;
+
+    while ((option = getopt(argc, argv, options)) != EOF) {
+        switch (option) {
+            case 'h':
+                usage(argv[0]);
+                break;
+            case 'y':
+                cout << "symbol table will be printed after compilation\n";
+                print_symtab = true;
+                break;
+            default:
+                break;
+        }
+    }
 
     // TODO: implement parser => yyparse();
 

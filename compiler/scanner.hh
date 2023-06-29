@@ -2,9 +2,10 @@
 #define __SCANNER_HH__
 
 typedef union {
-    long    ival; // integer value  (T_INTNUM)
-    double  rval; // real value     (T_REALNUM)
-    // TODO: add pool_index for string literals
+    long        ival;   // integer value  (T_INTNUM)
+    double      rval;   // real value     (T_REALNUM)
+    pool_index  str;    // string value   (T_STRING)
+    pool_index  pool_p; // id value       (T_ID)
 } YYSTYPE;
 
 typedef struct {
