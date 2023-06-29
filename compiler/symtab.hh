@@ -15,9 +15,13 @@ typedef union {
 } const_val;
 
 enum symbol_types {
+    SYM_VAR,
     SYM_FUNC,
+    SYM_PROC,
+    SYM_TYPE,
     SYM_PARAM,
     SYM_CONST,
+    SYM_ARRAY,
     SYM_UNDEF
 };
 typedef enum symbol_types sym_type;
@@ -29,16 +33,20 @@ const pool_index  BASE_POOL_SIZE = 1024;// base size of string pool
 const sym_index   MAX_SYM = 1024;       // max size of symbol table
 const sym_index   NULL_SYM = -1;        // signifies 'no symbol'
 
-// TODO: handle non-int array sizes
+const int ILLEGAL_ARRAY_CARD = -1;      // non-int array size
 
 /* sets limit for max nr of temp variables */
 const int MAX_TEMP_VARS = 999999;
 const int MAX_TEMP_VARS_LEN = 8;
 
 /* predefined symbol classes */
-class constant_symbol;
 class parameter_symbol;
+class procedure_symbol;
+class constant_symbol;
 class function_symbol;
+class variable_symbol;
+class array_symbol;
+class type_symbol;
 
 class symbol_table;
 
@@ -115,6 +123,22 @@ public:
 
     symbol(pool_index);
 
+    virtual variable_symbol *get_variable_symbol() {
+        fatal("Illegal downcasting to variable from symbol class");
+        return NULL;
+    }
+    virtual array_symbol *get_array_symbol() {
+        fatal("Illegal downcasting to array from symbol class");
+        return NULL;
+    }
+    virtual type_symbol *get_type_symbol() {
+        fatal("Illegal downcasting to type from symbol class");
+        return NULL;
+    }
+    virtual procedure_symbol *get_procedure_symbol() {
+        fatal("Illegal downcasting to procedure from symbol class");
+        return NULL;
+    }
     virtual constant_symbol *get_constant_symbol() {
         fatal("Illegal downcasting to constant from symbol class");
         return NULL;
@@ -141,6 +165,62 @@ public:
     constant_symbol(const pool_index);
 
     virtual constant_symbol *get_constant_symbol() {
+        return this;
+    }
+};
+
+class variable_symbol : public symbol {
+protected:
+    virtual void print(ostream &);
+
+public:
+    variable_symbol(const pool_index);
+
+    virtual variable_symbol *get_variable_symbol() {
+        return this;
+    }
+};
+
+//TODO: Write description
+class array_symbol : public symbol {
+protected:
+    virtual void print(ostream &);
+
+public:
+    sym_index index_type;
+    int array_cardinality; //nr of elements
+    array_symbol(const pool_index);
+
+    virtual array_symbol *get_array_symbol() {
+        return this;
+    }
+};
+
+//TODO: Write documentation
+class procedure_symbol : public symbol {
+protected:
+    virtual void print(ostream &);
+
+public:
+    int ar_size;
+    int label_nr;
+
+    parameter_symbol *last_param;
+    procedure_symbol(const pool_index);
+
+    virtual procedure_symbol *get_procedure_symbol() {
+        return this;
+    }
+};
+
+class type_symbol : public symbol {
+protected:
+    virtual void print(ostream &);
+
+public:
+    type_symbol(const pool_index);
+
+    virtual type_symbol *get_type_symbol() {
         return this;
     }
 };
@@ -326,6 +406,28 @@ public:
                               const pool_index,
                               const sym_index);
 
+    sym_index enter_variable (position_information *,
+                              const pool_index,
+                              const sym_index);
+
+    sym_index enter_variable (const pool_index,
+                              const sym_index);
+
+    sym_index enter_array    (position_information *,
+                              const pool_index,
+                              const sym_index,
+                              const int);
+
+    sym_index enter_procedure(position_information *,
+                    const pool_index);
+
+    sym_index enter_procedure(position_information *,
+                              const pool_index,
+                              const sym_index);
+
+    sym_index enter_type     (position_information *,
+                              const pool_index);
+    
     /* display methods */
 
     /*

@@ -49,8 +49,11 @@ typedef struct {
 #define T_PROGRAM       284 // program
 #define T_FUNCTION      285 // function
 #define T_STRING        286 // 'coff lang'
+#define T_VAR           287 // var
+#define T_PROCEDURE     288 // procedure
+#define T_ARRAY         289 // array
 
-// TODO: add nr of symbols
+#define NR_SYMBOLS      99
 
 extern YYSTYPE yylval; // additional info for certain tokens
 extern YYLTYPE yylloc; // tracking position in source code

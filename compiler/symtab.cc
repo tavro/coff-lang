@@ -60,8 +60,42 @@ symbol_table::symbol_table() {
 
     position_information *dummy_pos = new position_information();
     
-    // TODO: implement the rest
+    enter_procedure(dummy_pos, pool_install(capitalize("global."))); // represents global level
+    if(0==sym_table[0]) {
+        throw std::logic_error("Failed to install symbol");
+    }
+    sym_table[0]->type = void_type;
     
+    void_type = enter_type(dummy_pos, pool_install(capitalize("void")));
+    sym_table[void_type]->type = void_type;
+
+    int_type = enter_type(dummy_pos, pool_install(capitalize("int")));
+    real_type = enter_type(dummy_pos, pool_install(capitalize("real")));
+
+    // TODO: write documentation for below
+    {
+        sym_index read_sym = enter_function(dummy_pos, pool_install(capitalize("read")));
+        sym_table[read_sym]->type = int_type;
+    }
+    {
+        sym_index write_sym = enter_procedure(dummy_pos, pool_install(capitalize("write")));
+        sym_index int_arg = enter_parameter(dummy_pos, pool_install(capitalize("int-arg")), int_type);
+        procedure_symbol *proc = sym_table[write_sym]->get_procedure_symbol();
+        proc->last_param = sym_table[int_arg]->get_parameter_symbol();
+    }
+
+    sym_index trunc_sym = enter_function(dummy_pos, pool_install(capitalize("trunc")));
+    symbol *trunc = sym_table[trunc_sym];
+    trunc->type = int_type;
+
+    sym_index real_arg = enter_parameter(dummy_pos, pool_install(capitalize("real-arg")), real_type);
+
+    parameter_symbol *par = sym_table[real_arg]->get_parameter_symbol();
+    par->preceding = NULL;
+    par->offset = 0;
+    trunc->get_function_symbol()->last_param = par;
+
+    sym_table[0]->get_procedure_symbol()->last_param = NULL;
 }
 
 /* utility functions */
@@ -95,13 +129,30 @@ sym_index symbol_table::gen_temp_var(sym_index type) {
     pool_index pool_p = pool_install((char*)name.c_str());
 
     if (type == int_type) {
-        // COMMENT: forgot this wasnt implemented yet
-        // TODO: return enter_variable(pool_p, int_type);
+        return enter_variable(pool_p, int_type);
     }
-    // TODO: return enter_variable(pool_p, real_type);
+    return enter_variable(pool_p, real_type);
 }
 
-// TODO: get_size() is not implemented
+int symbol_table::get_size(const sym_index type) {
+    if(type == int_type) {
+        return 8;
+    }
+
+    if(type == real_type) {
+        return 8;
+    }
+
+    if(type == void_type) {
+        debug() << "get_size() request for void_type - probably an error.\n";
+        return 0;
+    }
+
+    // should never happen
+    print(1);
+    fatal("Internal compiler error: get_size(): type size confusion");
+    return -1;
+}
 
 // TODO: write description
 void symbol_table::print(int detail) {
@@ -371,8 +422,118 @@ sym_index symbol_table::enter_constant(position_information *pos, const pool_ind
     return sym_p;
 }
 
-// TODO: when parser implemented, create enter_variable methods
-// as well as other relevant methods
+//TODO: Write documentation
+sym_index symbol_table::enter_variable(position_information *pos, const pool_index pool_p, const sym_index type) {
+    sym_index sym_p = install_symbol(pool_p, SYM_VAR);
+    symbol *tmp = sym_table[sym_p];
+
+    if(tmp == NULL) {
+        fatal("install_symbol not working correctly");
+        return NULL_SYM;
+    }
+
+    if(tmp->tag != SYM_UNDEF) {
+        type_error(pos) << "Redeclaration: " << tmp << endl;
+        return sym_p;
+    }
+
+    variable_symbol *var = tmp->get_variable_symbol();
+
+    var->type = type;
+    var->tag = SYM_VAR;
+
+    tmp = sym_table[current_environment()];
+
+    if(tmp->tag == SYM_FUNC) {
+        function_symbol *cur_func = tmp->get_function_symbol();
+        var->offset = cur_func->ar_size;
+        cur_func->ar_size += get_size(type);
+        sym_table[current_environment()] = cur_func;
+    }
+    else {
+        procedure_symbol *cur_proc = tmp->get_procedure_symbol();
+        var->offset = cur_proc->ar_size;
+        cur_proc->ar_size += get_size(type);
+        sym_table[current_environment()] = cur_proc;
+    }
+
+    sym_table[sym_p] = var;
+    return sym_p;
+}
+
+sym_index symbol_table::enter_variable(pool_index pool_p, sym_index type) {
+    return enter_variable(NULL, pool_p, type);
+}
+
+// TODO: Write description
+sym_index symbol_table::enter_array(position_information *pos, const pool_index pool_p, const sym_index type, const int cardinality) {
+    // TODO: Implement enter_array
+    sym_index sym_p = install_symbol(pool_p, SYM_ARRAY);
+    array_symbol *arr = sym_table[sym_p]->get_array_symbol();
+
+    if(arr->tag != SYM_UNDEF) {
+        type_error(pos) << "Redeclaration: " << arr << endl;
+        return sym_p;
+    }
+
+    arr->type = type;
+    arr->tag = SYM_ARRAY;
+    arr->array_cardinality = cardinality;
+    arr->index_type = int_type;
+
+    symbol *tmp = sym_table[current_environment()];
+
+    if(cardinality != ILLEGAL_ARRAY_CARD) {
+        if(tmp->tag == SYM_FUNC) {
+            function_symbol *cur_func = tmp->get_function_symbol();
+            arr->offset = cur_func->ar_size;
+            cur_func->ar_size += get_size(type) * cardinality;
+            sym_table[current_environment()] = cur_func;
+        }
+        else {
+            procedure_symbol *cur_proc = tmp->get_procedure_symbol();
+            arr->offset = cur_proc->ar_size;
+            cur_proc->ar_size += get_size(type) * cardinality;
+            sym_table[current_environment()] = cur_proc;
+        }
+    }
+    sym_table[sym_p] = arr;
+
+    return sym_p;
+}
+
+sym_index symbol_table::enter_procedure(position_information *pos, const pool_index pool_p) {
+    sym_index sym_p = install_symbol(pool_p, SYM_PROC);
+    procedure_symbol *proc = sym_table[sym_p]->get_procedure_symbol();
+
+    if(proc->tag != SYM_UNDEF) {
+        type_error(pos) << "Redeclaration: " << proc << endl;
+        return sym_p;
+    }
+
+    proc->tag = SYM_PROC;
+    proc->type = void_type;
+    proc->last_param = NULL;
+    proc->ar_size = 0;
+    proc->label_nr = get_next_label();
+
+    sym_table[sym_p] = proc;
+    return sym_p;
+}
+
+sym_index symbol_table::enter_type(position_information *pos, const pool_index pool_p) {
+    sym_index sym_p = install_symbol(pool_p, SYM_TYPE);
+
+    if(sym_table[sym_p]->tag != SYM_UNDEF) {
+        type_error(pos) << "Redeclaration: " << sym_table[sym_p] << endl;
+        return sym_p;
+    }
+
+    sym_table[sym_p]->tag = SYM_TYPE;
+    sym_table[sym_p]->type = void_type;
+
+    return sym_p;
+}
 
 sym_index symbol_table::enter_function(position_information *pos, const pool_index pool_p) {
     sym_index sym_p = install_symbol(pool_p, SYM_FUNC);

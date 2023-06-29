@@ -21,6 +21,24 @@ function_symbol::function_symbol(const pool_index pool_p) : symbol(pool_p) {
     last_param = NULL;
 }
 
+variable_symbol::variable_symbol(const pool_index pool_p) : symbol(pool_p) {
+}
+
+type_symbol::type_symbol(const pool_index pool_p) : symbol(pool_p) {
+}
+
+array_symbol::array_symbol(const pool_index pool_p) : symbol(pool_p) {
+    // TODO: change this
+    index_type = void_type;
+    array_cardinality = 0;
+}
+
+procedure_symbol::procedure_symbol(const pool_index pool_p) : symbol(pool_p) {
+    ar_size = 0;
+    label_nr = 0;
+    last_param = NULL;
+}
+
 /* printing functions */
 
 symbol::format_type symbol::output_format = symbol::LONG; // default detail level
@@ -42,6 +60,18 @@ void symbol::print(ostream &o) {
                 case SYM_UNDEF:
                     o << "SYM_UNDEF ";
                     break;
+                case SYM_VAR:
+                    o << "SYM_VAR ";
+                    break;
+                case SYM_ARRAY:
+                    o << "SYM_ARRAY ";
+                    break;
+                case SYM_PROC:
+                    o << "SYM_PROC ";
+                    break;
+                case SYM_TYPE:
+                    o << "SYM_TYPE ";
+                    break;
                 case SYM_CONST:
                     o << "SYM_CONST ";
                     break;
@@ -59,6 +89,18 @@ void symbol::print(ostream &o) {
             switch (tag) {
                 case SYM_UNDEF:
                     o << "(SYM_UNDEF) ";
+                    break;
+                case SYM_VAR:
+                    o << "(SYM_VAR) ";
+                    break;
+                case SYM_ARRAY:
+                    o << "(SYM_ARRAY) ";
+                    break;
+                case SYM_PROC:
+                    o << "(SYM_PROC) ";
+                    break;
+                case SYM_TYPE:
+                    o << "(SYM_TYPE) ";
                     break;
                 case SYM_CONST:
                     o << "(SYM_CONST) ";
@@ -110,6 +152,108 @@ void constant_symbol::print(ostream &o) {
         default:
             fatal("Bad output format in constant_symbol::print()");
             break;
+    }
+}
+
+void variable_symbol::print(ostream &o) {
+    symbol::print(o);
+    switch (output_format) {
+        case LONG:
+            o << " class:       variable_symbol" << endl;
+            break;
+        case SUMMARY:
+        case SHORT:
+            break;
+        default:
+            fatal("Bad output format in variable_symbol::print()");
+            break;
+    }
+}
+
+void array_symbol::print(ostream &o) {
+    symbol::print(o);
+    switch (output_format) {
+        case LONG:
+            o << " class:       array_symbol" << endl;
+            o << " index_type:  int" << endl;
+            o << " cardinality: " << array_cardinality << endl;
+            break;
+        case SUMMARY:
+            o << " [" << array_cardinality << "]";
+            break;
+        case SHORT:
+            break;
+        default:
+            fatal("Bad output format in array_symbol::print()");
+            break;
+    }
+}
+
+void type_symbol::print(ostream &o) {
+    symbol::print(o);
+    switch (output_format) {
+        case LONG:
+            o << " class:       type_symbol" << endl;
+            break;
+        case SUMMARY:
+        case SHORT:
+            break;
+        default:
+            fatal("Bad output format in type_symbol::print()");
+            break;
+    }
+}
+
+void procedure_symbol::print(ostream &o) {
+    symbol::print(o);
+
+    switch (output_format) {
+        case LONG: {
+            o << " class:       procedure_symbol" << endl;
+            o << " ar_size:     " << ar_size << endl;
+            o << " label_nr:    " << label_nr << endl;
+            o << " params:  ";
+
+            if(last_param == NULL) {
+                o << "none" << endl;
+            }
+            else {
+                parameter_symbol *tmp = last_param;
+                o << short_symbols;
+
+                while(tmp != NULL) {
+                    o << tmp << "  ";
+                    tmp = tmp->preceding;
+                }
+
+                o << long_symbols << endl;
+            }
+            break;
+        }
+        case SUMMARY: {
+            o << "(";
+            parameter_symbol *tmp = last_param;
+            o << short_symbols;
+
+            while (tmp != NULL) {
+                o << tmp;
+                tmp = tmp->preceding;
+                if (tmp != NULL) {
+                    o << ", ";
+                }
+            }
+
+            o << summary_symbols;
+            o << ")";
+            break;
+        }
+        case SHORT: {
+            break;
+        }
+        default: {
+            fatal("Bad output format in procedure_symbol::print()");
+            break;
+        }
     }
 }
 
@@ -178,7 +322,7 @@ void function_symbol::print(ostream &o) {
             o << ") returns " << sym_tab->get_symbol(type)
               << summary_symbols;
             break;
-        } 
+        }
         case SHORT: {
             break;
         }
