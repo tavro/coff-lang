@@ -189,13 +189,10 @@ STR_ERR 	'([^'\n]|'')*\n
                 yylloc.first_column = column;
                 column += yyleng;
 
-				/* 
-				TODO:            
                 long value = strtol(yytext, 0, 10);
                 if(value == LONG_MAX && errno == ERANGE)
                     yyerror("Integer out of range");
                 yylval.ival = value;
-				*/
 
                 return T_INT;
 			}
@@ -205,11 +202,8 @@ STR_ERR 	'([^'\n]|'')*\n
                 yylloc.first_column = column;
                 column += yyleng;
                 
-				/*
-				TODO:
 				char *ptr;
                 yylval.rval = strtod(yytext, &ptr);
-				*/
 
             	return T_REAL;
 			}
@@ -219,10 +213,7 @@ STR_ERR 	'([^'\n]|'')*\n
                 yylloc.first_column = column;
                 column += yyleng;
 
-				/*
-				TODO:
                 yylval.pool_p = sym_tab->pool_install(sym_tab->capitalize(yytext));
-				*/
 				
                 return T_ID;
 			}
@@ -232,10 +223,7 @@ STR_ERR 	'([^'\n]|'')*\n
                 yylloc.first_column = column;
                 column += yyleng;
 
-				/*
-				TODO:
 				yylval.str = sym_tab->pool_install(sym_tab->fix_string(yytext));
-				*/
 
                 return T_STRING;
 			}
