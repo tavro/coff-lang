@@ -169,7 +169,7 @@ const_decl          : T_ID T_EQ integer T_SEMICOLON
                     }
                     ;
 
-variable_part       : T_VAR var_decls
+var_part            : T_VAR var_decls
                     | /* intentionally empty */
                     ;
 
@@ -185,9 +185,9 @@ var_decl            : T_ID T_COLON type_id T_SEMICOLON
                     | T_ID T_COLON T_ARRAY T_LEFTBRACKET integer T_RIGHTBRACKET type_id T_SEMICOLON
                     {
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
-                        sym_tab->enter_array(pos, $1, $8->sym_p, $5->value);
+                        sym_tab->enter_array(pos, $1, $7->sym_p, $5->value);
                     }
-                    |
+                    | T_ID T_COLON T_ARRAY T_LEFTBRACKET const_id T_RIGHTBRACKET type_id T_SEMICOLON
                     {
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
                         
@@ -201,10 +201,10 @@ var_decl            : T_ID T_COLON type_id T_SEMICOLON
                         else {
                             constant_symbol *con = tmp->get_constant_symbol();
                             if(con->type == int_type) {
-                                sym_tab->enter_array(pos, $1, $8->sym_p, con->const_val.ival);
+                                sym_tab->enter_array(pos, $1, $7->sym_p, con->const_val.ival);
                             }
                             else {
-                                sym_tab->enter_array(pos, $1, $8->sym_p, ILLEGAL_ARRAY_CARD);
+                                sym_tab->enter_array(pos, $1, $7->sym_p, ILLEGAL_ARRAY_CARD);
                             }
                         }
                     }
@@ -302,7 +302,7 @@ opt_param_list      : T_LEFTPAR param_list T_RIGHTPAR
                     {
                         $$ = $2;
                     }
-                    | L_LEFTPAR error T_RIGHTPAR
+                    | T_LEFTPAR error T_RIGHTPAR
                     {
                         yyerrok;
                         $$ = NULL;
@@ -338,7 +338,7 @@ param               : T_ID T_COLON type_id
 comp_stmt           : stmt_list
                     {
                         // TODO: Look over this, may need begin and end keywords
-                        $$ = $2;
+                        $$ = $1;
                     }
                     ;
 
@@ -440,7 +440,7 @@ elseif_list         : elseif_list elseif
                     }
                     ;
 
-elseif              : T_ELSEIF expr statement_list
+elseif              : T_ELSEIF expr stmt_list
                     {
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
                         $$ = new ast_elseif(pos, $2, $3);

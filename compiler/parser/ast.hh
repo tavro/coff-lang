@@ -435,7 +435,7 @@ protected:
 public:
     ast_add(position_information *, ast_expression *, ast_expression *);
 
-    virtual void type_check(); // TODO: Implement semantic analyser
+    virtual sym_index type_check(); // TODO: Implement semantic analyser
     virtual void optimize();   // TODO: Implement optimizer
     // TODO: Implement intermediate code generation
 
@@ -451,7 +451,7 @@ protected:
 public:
     ast_sub(position_information *, ast_expression *, ast_expression *);
 
-    virtual void type_check(); // TODO: Implement semantic analyser
+    virtual sym_index type_check(); // TODO: Implement semantic analyser
     virtual void optimize();   // TODO: Implement optimizer
     // TODO: Implement intermediate code generation
 
@@ -470,7 +470,7 @@ protected:
 public:
     ast_mult(position_information *, ast_expression *, ast_expression *);
 
-    virtual void type_check(); // TODO: Implement semantic analyser
+    virtual sym_index type_check(); // TODO: Implement semantic analyser
     virtual void optimize();   // TODO: Implement optimizer
     // TODO: Implement intermediate code generation
 
@@ -486,7 +486,7 @@ protected:
 public:
     ast_div(position_information *, ast_expression *, ast_expression *);
 
-    virtual void type_check(); // TODO: Implement semantic analyser
+    virtual sym_index type_check(); // TODO: Implement semantic analyser
     virtual void optimize();   // TODO: Implement optimizer
     // TODO: Implement intermediate code generation
 

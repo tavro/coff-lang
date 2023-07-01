@@ -7,7 +7,7 @@ used to check that all functions contain return statements
 */
 static bool has_return = false;
 
-void semantic:do_typecheck(symbol *env, ast_statement_list *body) {
+void semantic::do_typecheck(symbol *env, ast_statement_list *body) {
     has_return = false;
     if(body) {
         body->type_check();

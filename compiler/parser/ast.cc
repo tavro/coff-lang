@@ -23,18 +23,18 @@ ast_expression::ast_expression(position_information *p, sym_index s) : ast_node(
 // TODO: binary relation
 
 ast_binary_operation::ast_binary_operation(position_information *p, ast_expression *l, ast_expression *r) : ast_expression(p), left(l), right(r) {
-    tag = AST_BINARY_OPERATION;
+    tag = AST_BINARY_OP;
 }
 
 ast_lval::ast_lval(position_information *p) : ast_expression(p) {
-    tag = AST_LVALUE;
+    tag = AST_LVAL;
 }
 
-ast_lval(position_information *p, sym_index s) : ast_expression(p, s) {
-    tag = AST_LVALUE;
+ast_lval::ast_lval(position_information *p, sym_index s) : ast_expression(p, s) {
+    tag = AST_LVAL;
 }
 
-ast_elseif::ast_elseif(position_information *p, ast_expression *c, ast_statement_list b*) : ast_node(p), condition(c), body(b) {
+ast_elseif::ast_elseif(position_information *p, ast_expression *c, ast_statement_list *b) : ast_node(p), condition(c), body(b) {
     tag = AST_ELSEIF;
 }
 
@@ -248,7 +248,7 @@ void ast_expression_list::print(ostream& o) {
     o << preceding << endl;
     end_child(o);
     last_child(o);
-    o << last_expression;
+    o << last_expr;
     end_child(o);
 }
 
@@ -258,7 +258,7 @@ void ast_statement_list::print(ostream& o) {
     o << preceding << endl;
     end_child(o);
     last_child(o);
-    o << last_statement;
+    o << last_stmt;
     end_child(o);
 }
 
