@@ -368,30 +368,319 @@ stmt_list           : stmt
 stmt                : T_IF expr stmt_list elseif_list else_part
                     {
                         // TODO: may need end keyword
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+                        $$ = new ast_if(pos, $2, $3, $4, $5);
                     }
                     | T_WHILE expr stmt_list
                     {
                         // TODO: may need end keyword
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+                        $$ = new ast_while(pos, $2, $3);
                     }
                     | proc_id T_LEFTPAR opt_expr_list T_RIGHTPAR
                     {
-
+                        $$ = new ast_procedure_call($1->pos, $1, $3);
                     }
                     | /* TODO: assignment */
                     {
-
+                        // TODO: assignment
                     }
                     | T_RETURN expr
                     {
-
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+                        $$ = new ast_return(pos, $2);
                     }
                     | T_RETURN
                     {
-
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+                        $$ = new ast_return(pos);
                     }
                     | /* intentionally empty */
                     {
-                        // TODO: Implement rest
+                        $$ = NULL;
+                    }
+                    ;
+
+lvar                : lvar_id
+                    {
+                        $$ = $1;
+                    }
+                    | array_id T_LEFTBRACKET expr T_RIGHTBRACKET
+                    {
+                        $$ = new ast_indexed($1->pos, $1, $3);
+                    }
+                    | array_id T_LEFTBRACKET error T_RIGHTBRACKET
+                    {
+                        $$ = NULL;
+                    }
+                    ;
+
+rvar                : rvar_id
+                    {
+                        $$ = $1;
+                    }
+                    | array_id T_LEFTBRACKET expr T_RIGHTBRACKET
+                    {
+                        $$ = new ast_indexed($1->pos, $1, $3);
+                    }
+                    | array_id T_LEFTBRACKET error T_RIGHTBRACKET
+                    {
+                        yyerrok;
+                        $$ = NULL;
+                    }
+                    ;
+
+elseif_list         : elseif_list elseif
+                    {
+                        $$ = new ast_elseif_list($2->pos, $2, $1);
+                    }
+                    | /* intentionally empty */
+                    {
+                        $$ = NULL;
+                    }
+                    ;
+
+elseif              : T_ELSEIF expr statement_list
+                    {
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+                        $$ = new ast_elseif(pos, $2, $3);
+                    }
+                    ;
+
+else_part           : T_ELSE stmt_list
+                    {
+                        $$ = $2;
+                    }
+                    | /* intentionally empty */
+                    {
+                        $$ = NULL;
+                    }
+                    ;
+
+opt_expr_list       : expr_list
+                    {
+                        $$ = $1;
+                    }
+                    | /* intentionally empty */
+                    {
+                        $$ = NULL;
+                    }
+                    ;
+
+expr_list           : expr
+                    {
+                        $$ = new ast_expression_list($1->pos, $1);
+                    }
+                    | expr_list T_COMMA expr
+                    {
+                        $$ = new ast_expr_list($1->pos, $3, $1);
+                    }
+                    ;
+
+expr                : simple_expr
+                    {
+                        $$ = $1;
+                    }
+                    | expr T_EQ simple_expr
+                    {
+                        $$ = new ast_equal($1->pos, $1, $3);
+                    }
+                    | /* TODO: not eq */
+                    {
+                        // TODO: not eq
+                    }
+                    | expr T_LESSTHAN simple_expr
+                    {
+                        $$ = new ast_less_than($1->pos, $1, $3);
+                    }
+                    | expr T_GREATERTHAN simple_expr
+                    {
+                        $$ = new ast_greater_than($1->pos, $1, $3);
+                    }
+                    ;
+
+simple_expr         : term
+                    {
+                        $$ = $1;
+                    }
+                    | T_ADD term
+                    {
+                        $$ = $2;
+                    }
+                    | T_SUB term
+                    {
+                        // TODO: uminus
+                    }
+                    | /* TODO: or */
+                    {
+                        // TODO: or
+                    }
+                    | simple_expr T_ADD term
+                    {
+                        $$ = new ast_add($1->pos, $1, $3);
+                    }
+                    | simple_expr T_SUB term
+                    {
+                        $$ = new ast_sub($1->pos, $1, $3);
+                    }
+                    ;
+
+term                : factor
+                    {
+                        $$ = $1;
+                    }
+                    | /* TODO: and, idiv/rdiv, mod */
+                    {
+                        // TODO: and, idiv/rdiv, mod
+                    }
+                    | term T_MULT factor
+                    {
+                        $$ = new ast_mult($1->pos, $1, $3);
+                    }
+                    | term T_DIV factor
+                    {
+                        $$ = new ast_div($1->pos, $1, $3);
+                    }
+                    ;
+
+factor              : rvar
+                    {
+                        $$ = $1;
+                    }
+                    | func_call
+                    {
+                        $$ = $1;
+                    }
+                    | integer
+                    {
+                        $$ = $1;
+                    }
+                    | real
+                    {
+                        $$ = $1;
+                    }
+                    | /* TODO: not */
+                    {
+                        // TODO: not
+                    }
+                    | T_LEFTPAR expr T_RIGHTPAR
+                    {
+                        $$ = $2;
+                    }
+                    ;
+
+func_call           : func_id T_LEFTPAR opt_expr_list T_RIGHTPAR
+                    {
+                        $$ = new ast_function_call($1->pos, $1, $3);
+                    }
+                    ;
+
+integer             : T_INT
+                    {
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+                        $$ = new ast_int(pos, $1);
+                    }
+                    ;
+
+real                : T_REAL
+                    {
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+                        $$ = new ast_real(pos, $1);
+                    }
+                    ;
+
+type_id             : id
+                    {
+                        if() {
+                            type_error($1->pos) << "not declared "
+                            << "as type: "
+                            << yytext << endl << flush;
+                        }
+                        $$ = $1;
+                    }
+                    ;
+
+const_id            : id
+                    {
+                        if() {
+                            type_error($1->pos) << "not declared "
+                            << "as const: "
+                            << yytext << endl << flush;
+                        }
+                        $$ = $1;
+                    }
+                    ;
+
+lvar_id             : id
+                    {
+                        if() {
+                            type_error($1->pos) << "not declared "
+                            << "as var or param: "
+                            << yytext << endl << flush;
+                        }
+                        $$ = $1;
+                    }
+                    ;
+
+rvar_id             : id
+                    {
+                        if() {
+                            type_error($1->pos) << "not declared "
+                            << "as var, param or const: "
+                            << yytext << endl << flush;
+                        }
+                        $$ = $1;
+                    }
+                    ;
+
+proc_id             : id
+                    {
+                        if() {
+                            type_error($1->pos) << "not declared "
+                            << "as procedure: "
+                            << yytext << endl << flush;
+                        }
+                        $$ = $1;
+                    }
+                    ;
+
+func_id             : id
+                    {
+                        if() {
+                            type_error($1->pos) << "not declared "
+                            << "as function: "
+                            << yytext << endl << flush;
+                        }
+                        $$ = $1;
+                    }
+                    ;
+
+array_id            : id
+                    {
+                        if() {
+                            type_error($1->pos) << "not declared "
+                            << "as array: "
+                            << yytext << endl << flush;
+                        }
+                        $$ = $1;
+                    }
+                    ;
+
+id                  : T_ID
+                    {
+                        sym_index sym_p;
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+
+                        /*
+                        make sure symbol is declared
+                        */
+                        sym_p = sym_tab->lookup_symbol($1);
+                        if(sym_p == NULL_SYM) {
+                            type_error(pos) << "not declared: " << yytext << endl << flush;
+                        }
+
+                        $$ = new ast_id(pos, sym_p);
+                        $$->type = sym_tab->get_symbol_type(sym_p);
                     }
                     ;
 
