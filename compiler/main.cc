@@ -30,7 +30,7 @@ void usage(char *program_name) {
 }
 
 int main(int argc, char **argv) {
-    char options[] = "h";
+    char options[] = "acyh"; // TODO: add more flags
     int option;
     bool print_symtab = false;
 
