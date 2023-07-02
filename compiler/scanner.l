@@ -3,8 +3,8 @@
 #include <string.h>
 #include <climits>
 
-#include "scanner.hh"
-#include "symtab.hh"
+#include "./parser/ast.hh"
+#include "./parser/parser.hh"
 
 int column = 0;
 

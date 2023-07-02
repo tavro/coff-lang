@@ -19,6 +19,8 @@ extern void yyerror(string);
 extern bool print_ast;
 extern bool type_check;
 // TODO: more flags
+
+#define YYDEBUG 1
 %}
 
 %union {
@@ -44,14 +46,14 @@ extern bool type_check;
 }
 
 // TODO: Desc may be a good idea
-%type <id>              id const_id lvar_id rvar_id array_id proc_id func_id type_id
+%type <id>              id const_id rvar_id array_id proc_id func_id type_id // TODO: lvar_id
 %type <statement_list>  stmt_list comp_stmt else_part
 %type <statement>       stmt
 %type <expression_list> opt_param_list param_list opt_expr_list expr_list
 %type <expression>      expr term factor simple_expr rvar
 %type <elseif_list>     elseif_list
 %type <elseif>          elseif
-%type <lval>            lvar
+// TODO: %type <lval>            lvar
 %type <param>           param
 %type <function_call>   func_call
 %type <function_head>   func_decl func_head
@@ -201,7 +203,7 @@ var_decl            : T_ID T_COLON type_id T_SEMICOLON
                         else {
                             constant_symbol *con = tmp->get_constant_symbol();
                             if(con->type == int_type) {
-                                sym_tab->enter_array(pos, $1, $7->sym_p, con->const_val.ival);
+                                sym_tab->enter_array(pos, $1, $7->sym_p, con->const_value.ival);
                             }
                             else {
                                 sym_tab->enter_array(pos, $1, $7->sym_p, ILLEGAL_ARRAY_CARD);
@@ -381,10 +383,6 @@ stmt                : T_IF expr stmt_list elseif_list else_part
                     {
                         $$ = new ast_procedure_call($1->pos, $1, $3);
                     }
-                    | /* TODO: assignment */
-                    {
-                        // TODO: assignment
-                    }
                     | T_RETURN expr
                     {
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
@@ -395,12 +393,13 @@ stmt                : T_IF expr stmt_list elseif_list else_part
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
                         $$ = new ast_return(pos);
                     }
-                    | /* intentionally empty */
+                    | /* intentionally empty */ /* TODO: assignment */
                     {
                         $$ = NULL;
                     }
                     ;
 
+/*
 lvar                : lvar_id
                     {
                         $$ = $1;
@@ -414,6 +413,7 @@ lvar                : lvar_id
                         $$ = NULL;
                     }
                     ;
+*/
 
 rvar                : rvar_id
                     {
@@ -473,7 +473,7 @@ expr_list           : expr
                     }
                     | expr_list T_COMMA expr
                     {
-                        $$ = new ast_expr_list($1->pos, $3, $1);
+                        $$ = new ast_expression_list($1->pos, $3, $1);
                     }
                     ;
 
@@ -483,7 +483,7 @@ expr                : simple_expr
                     }
                     | expr T_EQ simple_expr
                     {
-                        $$ = new ast_equal($1->pos, $1, $3);
+                        // $$ = new ast_equal($1->pos, $1, $3);
                     }
                     | /* TODO: not eq */
                     {
@@ -491,11 +491,11 @@ expr                : simple_expr
                     }
                     | expr T_LESSTHAN simple_expr
                     {
-                        $$ = new ast_less_than($1->pos, $1, $3);
+                        // $$ = new ast_less_than($1->pos, $1, $3);
                     }
                     | expr T_GREATERTHAN simple_expr
                     {
-                        $$ = new ast_greater_than($1->pos, $1, $3);
+                        // $$ = new ast_greater_than($1->pos, $1, $3);
                     }
                     ;
 
@@ -591,7 +591,7 @@ real                : T_REAL
 
 type_id             : id
                     {
-                        if() {
+                        if(sym_tab->get_symbol_tag($1->sym_p) != SYM_TYPE) {
                             type_error($1->pos) << "not declared "
                             << "as type: "
                             << yytext << endl << flush;
@@ -602,7 +602,7 @@ type_id             : id
 
 const_id            : id
                     {
-                        if() {
+                        if(sym_tab->get_symbol_tag($1->sym_p) != SYM_CONST) {
                             type_error($1->pos) << "not declared "
                             << "as const: "
                             << yytext << endl << flush;
@@ -611,9 +611,10 @@ const_id            : id
                     }
                     ;
 
+/*
 lvar_id             : id
                     {
-                        if() {
+                        if(sym_tab->get_symbol_tag($1->sym_p) != SYM_VAR && sym_tab->get_symbol_tag($1->sym_p) != SYM_PARAM) {
                             type_error($1->pos) << "not declared "
                             << "as var or param: "
                             << yytext << endl << flush;
@@ -621,10 +622,11 @@ lvar_id             : id
                         $$ = $1;
                     }
                     ;
+*/
 
 rvar_id             : id
                     {
-                        if() {
+                        if(sym_tab->get_symbol_tag($1->sym_p) != SYM_VAR && sym_tab->get_symbol_tag($1->sym_p) != SYM_PARAM && sym_tab->get_symbol_tag($1->sym_p) != SYM_CONST ) {
                             type_error($1->pos) << "not declared "
                             << "as var, param or const: "
                             << yytext << endl << flush;
@@ -635,7 +637,7 @@ rvar_id             : id
 
 proc_id             : id
                     {
-                        if() {
+                        if(sym_tab->get_symbol_tag($1->sym_p) != SYM_PROC) {
                             type_error($1->pos) << "not declared "
                             << "as procedure: "
                             << yytext << endl << flush;
@@ -646,7 +648,7 @@ proc_id             : id
 
 func_id             : id
                     {
-                        if() {
+                        if(sym_tab->get_symbol_tag($1->sym_p) != SYM_FUNC) {
                             type_error($1->pos) << "not declared "
                             << "as function: "
                             << yytext << endl << flush;
@@ -657,7 +659,7 @@ func_id             : id
 
 array_id            : id
                     {
-                        if() {
+                        if(sym_tab->get_symbol_tag($1->sym_p) != SYM_ARRAY) {
                             type_error($1->pos) << "not declared "
                             << "as array: "
                             << yytext << endl << flush;

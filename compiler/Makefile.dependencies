@@ -5,4 +5,5 @@ semantic.o: semantics/semantic.cc semantics/semantic.hh \
  semantics/../parser/ast.hh semantics/../parser/../symtab.hh \
  semantics/../parser/../error.hh
 error.o: error.cc error.hh
-main.o: main.cc
+main.o: main.cc parser/ast.hh parser/../symtab.hh parser/../error.hh \
+ parser/parser.hh

@@ -54,9 +54,9 @@ symbol_table::symbol_table() {
     sym_pos = -1;
 
     /* install predefined symbols */
-    if(true) { // TODO: Leave it until scanner is finished
-        return;
-    }
+    //if(true) { // TODO: Leave it until scanner is finished
+    //    return;
+    //}
 
     position_information *dummy_pos = new position_information();
     
@@ -381,7 +381,54 @@ void symbol_table::set_symbol_type(const sym_index sym_p, const sym_index type_p
 
 //TODO: write description
 sym_index symbol_table::install_symbol(const pool_index pool_p, const sym_type tag) {
-    //TODO: implement
+    sym_index index = this->lookup_symbol(pool_p);
+    symbol *sym;
+
+    if(index == 0 || get_symbol(index)->level < current_level) {
+        sym_pos++;
+
+        if(sym_pos >= MAX_SYM) {
+            fatal("symbol table is full");
+        }
+
+        switch(tag) {
+            case SYM_VAR:
+                sym = new variable_symbol(pool_p);
+                break;
+            case SYM_FUNC:
+                sym = new function_symbol(pool_p);
+                break;
+            case SYM_PROC:
+                sym = new procedure_symbol(pool_p);
+                break;
+            case SYM_CONST:
+                sym = new constant_symbol(pool_p);
+                break;
+            case SYM_PARAM:
+                sym = new parameter_symbol(pool_p);
+                break;
+            case SYM_ARRAY:
+                sym = new array_symbol(pool_p);
+                break;
+            case SYM_TYPE:
+                sym = new type_symbol(pool_p);
+                break;
+            default:
+                break;
+        }
+
+        hash_index h_index = this->hash(pool_p);
+
+        sym->level = current_level;
+        sym->hash_link = hash_table[h_index];
+        sym->back_link = h_index;
+
+        this->hash_table[h_index] = sym_pos;
+        this->sym_table[sym_pos] = sym;
+
+        return sym_pos;
+    }    
+    return index;
 }
 
 //TODO: write description
@@ -567,7 +614,18 @@ sym_index symbol_table::enter_parameter(position_information *pos, const pool_in
 
     parameter_symbol *tmp_param;
 
-    // TODO: if-elseif-else
+    if (tmp->tag == SYM_FUNC) {
+        function_symbol *func = tmp->get_function_symbol();
+        tmp_param = func->last_param;
+        func->last_param = par;
+    } else if (tmp->tag == SYM_PROC) {
+        procedure_symbol *proc = tmp->get_procedure_symbol();
+        tmp_param = proc->last_param;
+        proc->last_param = par;
+    } else {
+        fatal("Compiler confused about scope, aborting.");
+        return 0;
+    }
     
     par->preceding = tmp_param;
 

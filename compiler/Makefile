@@ -1,4 +1,4 @@
-CC	=	g++
+CC	=	g++ 
 CFLAGS	=	-std=c++11 -ggdb3 -Wall -Woverloaded-virtual -pedantic -pie
 GCFLAGS =	-std=c++11 -g -Wall -Wno-unused-function -Wno-unused-variable
 DPFLAGS =	-MM
@@ -39,8 +39,14 @@ scanner.cc : scanner.l .flex
 scanner.o : scanner.cc
 	$(CC) $(GCFLAGS) -c $<
 
+./semantics/semantic.o : ./semantics/semantic.cc
+	$(CC) $(GCFLAGS) -c -o ./semantics/semantic.o ./semantics/semantic.cc
+
 ./parser/parser.o : ./parser/parser.cc
-	$(CC) $(GCFLAGS) -c $<
+	$(CC) $(GCFLAGS) -c -o ./parser/parser.o ./parser/parser.cc
+
+./parser/ast.o: ./parser/ast.cc
+	$(CC) $(GCFLAGS) -c -o ./parser/ast.o ./parser/ast.cc
 
 .cc.o: $(DPFILE)
 	$(CC) $(CFLAGS) -c $<
