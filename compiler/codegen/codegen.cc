@@ -14,7 +14,7 @@ extern bool assembler_trace;
 
 #define STREAM out
 
-// TODO: code_gen instance
+code_generator *code_gen = new code_generator("d.out");
 // TODO: write documentation for whole class
 
 code_generator::code_generator(const string object_file_name) {
@@ -91,7 +91,7 @@ void code_generator::epilogue(symbol *old_env) {
 }
 
 void code_generator::find(sym_index sym_p, int *level, int *offset) {
-    symbol *sym = sym_tab->get_symbol(sym_p);
+    symbol *sym = sym_tab->gesymbol(sym_p);
     *level = sym->level;
 
     sym_type tag = sym->tag;

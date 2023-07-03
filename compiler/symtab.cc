@@ -54,10 +54,6 @@ symbol_table::symbol_table() {
     sym_pos = -1;
 
     /* install predefined symbols */
-    //if(true) { // TODO: Leave it until scanner is finished
-    //    return;
-    //}
-
     position_information *dummy_pos = new position_information();
     
     enter_procedure(dummy_pos, pool_install(capitalize("global."))); // represents global level
@@ -156,7 +152,143 @@ int symbol_table::get_size(const sym_index type) {
 
 // TODO: write description
 void symbol_table::print(int detail) {
-    // TODO: implement
+    if(detail == 2) {
+        if(pool_pos > 0) {
+            unsigned int pos = 0;
+
+            while(pos < strlen(string_pool)) {
+                unsigned int len = (int) string_pool[pos];
+                cout << len;
+
+                for(unsigned int k = pos + 1; k < pos + len + 1; k++) {
+                    cout << string_pool[k];
+                }
+
+                pos += len + 1;
+            }
+
+            cout << endl;
+
+            for(int j = 0; j < pool_pos; j++) {
+                cout << "-";
+            }
+            cout << "^" << " (pool_pos = " << pool_pos << ")" << endl;
+        }
+        else {
+            cout << "(String pool empty)" << endl;
+        }
+
+        return;
+    }
+
+    if(detail == 3) {
+        cout << "Hash table:\n";
+        
+        for(int j = 0; j < HASH_SIZE; j++) {
+            if(hash_table[j]) {
+                cout << j << ": " << hash_table[j] << endl;
+            }
+        }
+
+        return;
+    }
+
+    cout << endl << "Symbol table (size = " << sym_pos << "):\n";
+
+    switch (detail) {
+        case 1:
+            cout << "Pos  Name      Lev Hash Back Offs Type "
+                 << "     Tag\n";
+            cout << "---------------------------------------"
+                 << "--------\n";
+            for (int i = 0; i < sym_pos + 1; i++) {
+                symbol *tmp = sym_table[i];
+                if (tmp == NULL) {
+                    cout << i << ": " << "NULL" << endl;
+                    continue;
+                }
+
+                cout << setw(3) << i << ": ";
+                cout.flags(ios::left);
+                cout << setw(12) << pool_lookup(tmp->id);
+                cout.flags(ios::right);
+                cout << tmp->level
+                     << setw(5) << tmp->hash_link << setw(5)
+                     << tmp->back_link << setw(5) << tmp->offset << " ";
+
+                cout.flags(ios::left);
+                cout << setw(10);
+                cout << pool_lookup(sym_table[tmp->type]->id);
+                cout << setw(14);
+                switch (tmp->tag) {
+                    case SYM_UNDEF:
+                        cout << "SYM_UNDEF";
+                        break;
+                    case SYM_TYPE:
+                        cout << "SYM_TYPE";
+                        break;
+                    case SYM_VAR:
+                        cout << "SYM_VAR";
+                        break;
+                    case SYM_PARAM: {
+                        parameter_symbol *par = tmp->get_parameter_symbol();
+                        cout << "SYM_PARAM";
+                        if (par->preceding != NULL) {
+                            cout << setw(7) << "prec = "
+                                 << setw(12) <<
+                            pool_lookup(par->preceding->id);
+                        }
+                        break;
+                    }
+                    case SYM_PROC: {
+                        procedure_symbol * proc = tmp->get_procedure_symbol();
+                        cout << "SYM_PROC" << setw(6) << "lbl = "
+                             << setw(3) << proc->label_nr << setw(9)
+                             << "ar_size = " << setw(3) << proc->ar_size;
+                        break;
+                    }
+                    case SYM_FUNC: {
+                        function_symbol *func = tmp->get_function_symbol();
+                        cout << "SYM_FUNC" << setw(6) << "lbl = "
+                             << setw(3) << func->label_nr << setw(9)
+                             << "ar_size = " << setw(3) << func->ar_size;
+                        break;
+                    }
+                    case SYM_ARRAY: {
+                        array_symbol *arr = tmp->get_array_symbol();
+                        cout << "SYM_ARRAY" << setw(7) << "card = "
+                             << setw(4) << arr->array_cardinality;
+                        break;
+                    }
+                    case SYM_CONST: {
+                        constant_symbol *con = tmp->get_constant_symbol();
+                        if (con->type == int_type) {
+                            cout << "SYM_CONST" << setw(7) << "value = "
+                                 << con->const_value.ival;
+                        }
+                        else if (con->type == real_type) {
+                            cout << "SYM_CONST" << setw(7) << "value = "
+                                 << con->const_value.rval;
+                        }
+                        else {
+                            cout << "SYM_CONST" << setw(7) << "value = "
+                                 << "(error: bad type)";
+                        }
+                        break;
+                    }
+                }
+                cout.flags(ios::right);
+                cout << setw(0) << endl;
+            }
+            break;
+        default:
+            for (int i = 0; i < sym_pos + 1; i++) {
+                symbol *tmp = sym_table[i];
+                cout << "Pos = " << i << " -----------------------------\n"
+                     << tmp;
+            }
+            break;
+    }
 }
 
 /* string pool methods */

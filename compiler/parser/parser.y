@@ -1,10 +1,9 @@
 %{
 #include <iostream>
 #include "../semantics/semantic.hh"
-#include "../symtab.hh" // TODO: temporary => remove
+#include "../codegen/codegen.hh"
 
 // TODO: Write oprimizer
-// TODO: Write code generator
 
 extern char *yytext;
 extern int error_count;         // defined in error.cc
