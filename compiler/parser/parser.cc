@@ -72,26 +72,27 @@
 #include <iostream>
 #include "../semantics/semantic.hh"
 #include "../codegen/codegen.hh"
-
-// TODO: Write oprimizer
+#include "../optimizer/optimize.hh"
 
 extern char *yytext;
 extern int error_count;         // defined in error.cc
 extern symbol_table *sym_tab;   // defined in symtab.cc
 extern semantic *type_checker;
-
-// TODO: code generator
+extern code_generator *code_gen;
 
 extern int yylex();
 extern void yyerror(string);
 
 extern bool print_ast;
+extern bool print_quads;
 extern bool type_check;
-// TODO: more flags
+extern bool optimize;
+extern bool quads;
+extern bool assembler;
 
 #define YYDEBUG 1
 
-#line 95 "./parser/parser.cc"
+#line 96 "./parser/parser.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -588,15 +589,15 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    82,    82,   110,   116,   127,   128,   129,   132,   133,
-     136,   141,   146,   150,   167,   173,   174,   177,   178,   181,
-     186,   191,   214,   215,   218,   219,   222,   243,   266,   272,
-     279,   294,   302,   306,   312,   317,   323,   328,   339,   346,
-     355,   369,   375,   381,   385,   390,   396,   417,   421,   425,
-     432,   437,   442,   449,   454,   459,   464,   469,   473,   479,
-     483,   488,   491,   495,   501,   505,   509,   514,   517,   521,
-     527,   532,   535,   539,   545,   549,   553,   557,   562,   565,
-     571,   577,   584,   591,   602,   626,   637,   648,   659,   670
+       0,    83,    83,   128,   134,   145,   146,   147,   150,   151,
+     154,   159,   164,   168,   185,   191,   192,   195,   196,   199,
+     204,   209,   232,   233,   236,   237,   240,   278,   318,   324,
+     331,   346,   354,   358,   364,   369,   375,   380,   391,   398,
+     407,   421,   427,   433,   437,   442,   448,   469,   473,   477,
+     484,   489,   494,   501,   506,   511,   516,   521,   525,   531,
+     535,   540,   543,   547,   553,   557,   561,   566,   569,   573,
+     579,   584,   587,   591,   597,   601,   605,   609,   614,   617,
+     623,   629,   636,   643,   654,   678,   689,   700,   711,   722
 };
 #endif
 
@@ -1392,7 +1393,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: prog_decl subprog_part comp_stmt T_DOT  */
-#line 83 "./parser/parser.y"
+#line 84 "./parser/parser.y"
                     {
                         symbol *env = sym_tab->get_symbol((yyvsp[-3].procedure_head)->sym_p);
 
@@ -1406,10 +1407,27 @@ yyreduce:
                             cout << (ast_statement_list *)(yyvsp[-1].statement_list) << endl;
                         }
 
-                        // TODO: Implement optimizer
+                        if(optimize) {
+                            optimizer->do_optimize((yyvsp[-1].statement_list));
+                            if(print_ast) {
+                                cout << "\nOptimized AST for global level" << endl;
+                                cout << (ast_statement_list *)(yyvsp[-1].statement_list) << endl;
+                            }
+                        }
 
                         if(error_count == 0) {
-                            // TODO: Implement code generation
+                            if(quads) {
+                                quad_list *q = (yyvsp[-3].procedure_head)->do_quads((yyvsp[-1].statement_list));
+                                if(print_quads) {
+                                    cout << "\nQuad list for global level" << endl;
+                                    cout << (quad_list *)q << endl;
+                                }
+
+                                if(assembler) {
+                                    cout << "Generating assembler, global level" << endl;
+                                    code_gen->generate_assembler(q, env);
+                                }
+                            }
                         }
                         else {
                             cout << "Found " << error_count << " errors. "
@@ -1418,19 +1436,19 @@ yyreduce:
 
                         sym_tab->close_scope();
                     }
-#line 1422 "./parser/parser.cc"
+#line 1440 "./parser/parser.cc"
     break;
 
   case 3: /* prog_decl: prog_head T_SEMICOLON const_part var_part  */
-#line 111 "./parser/parser.y"
+#line 129 "./parser/parser.y"
                     {
                         (yyval.procedure_head) = (yyvsp[-3].procedure_head);
                     }
-#line 1430 "./parser/parser.cc"
+#line 1448 "./parser/parser.cc"
     break;
 
   case 4: /* prog_head: T_PROGRAM T_ID  */
-#line 117 "./parser/parser.y"
+#line 135 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-1]).first_line, (yylsp[-1]).first_column);
 
@@ -1439,37 +1457,37 @@ yyreduce:
                         (yyval.procedure_head) = new ast_procedure_head(pos, index);
                         sym_tab->open_scope();
                     }
-#line 1443 "./parser/parser.cc"
+#line 1461 "./parser/parser.cc"
     break;
 
   case 10: /* const_decl: T_ID T_EQ integer T_SEMICOLON  */
-#line 137 "./parser/parser.y"
+#line 155 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-3]).first_line, (yylsp[-3]).first_column);
                         sym_tab->enter_constant(pos, (yyvsp[-3].pool_p), int_type, (yyvsp[-1].integer)->value);
                     }
-#line 1452 "./parser/parser.cc"
+#line 1470 "./parser/parser.cc"
     break;
 
   case 11: /* const_decl: T_ID T_EQ real T_SEMICOLON  */
-#line 142 "./parser/parser.y"
+#line 160 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-3]).first_line, (yylsp[-3]).first_column);
                         sym_tab->enter_constant(pos, (yyvsp[-3].pool_p), real_type, (yyvsp[-1].real)->value);
                     }
-#line 1461 "./parser/parser.cc"
+#line 1479 "./parser/parser.cc"
     break;
 
   case 12: /* const_decl: T_ID T_EQ T_STRING T_SEMICOLON  */
-#line 147 "./parser/parser.y"
+#line 165 "./parser/parser.y"
                     {
                         // TODO: Not supported in Coff yet.
                     }
-#line 1469 "./parser/parser.cc"
+#line 1487 "./parser/parser.cc"
     break;
 
   case 13: /* const_decl: T_ID T_EQ const_id T_SEMICOLON  */
-#line 151 "./parser/parser.y"
+#line 169 "./parser/parser.y"
                     {
                         /*
                         EXAMPLE:
@@ -1486,37 +1504,37 @@ yyreduce:
                             sym_tab->enter_constant(pos, (yyvsp[-3].pool_p), (yyvsp[-1].id)->type, sym->const_value.rval);
                         }
                     }
-#line 1490 "./parser/parser.cc"
+#line 1508 "./parser/parser.cc"
     break;
 
   case 14: /* const_decl: T_ID T_EQ error T_SEMICOLON  */
-#line 168 "./parser/parser.y"
+#line 186 "./parser/parser.y"
                     {
                         yyerrok;
-                    }
-#line 1498 "./parser/parser.cc"
-    break;
-
-  case 19: /* var_decl: T_ID T_COLON type_id T_SEMICOLON  */
-#line 182 "./parser/parser.y"
-                    {
-                        position_information* pos = new position_information((yylsp[-3]).first_line, (yylsp[-3]).first_column);
-                        sym_tab->enter_variable(pos, (yyvsp[-3].pool_p), (yyvsp[-1].id)->sym_p);
-                    }
-#line 1507 "./parser/parser.cc"
-    break;
-
-  case 20: /* var_decl: T_ID T_COLON T_ARRAY T_LEFTBRACKET integer T_RIGHTBRACKET type_id T_SEMICOLON  */
-#line 187 "./parser/parser.y"
-                    {
-                        position_information* pos = new position_information((yylsp[-7]).first_line, (yylsp[-7]).first_column);
-                        sym_tab->enter_array(pos, (yyvsp[-7].pool_p), (yyvsp[-1].id)->sym_p, (yyvsp[-3].integer)->value);
                     }
 #line 1516 "./parser/parser.cc"
     break;
 
+  case 19: /* var_decl: T_ID T_COLON type_id T_SEMICOLON  */
+#line 200 "./parser/parser.y"
+                    {
+                        position_information* pos = new position_information((yylsp[-3]).first_line, (yylsp[-3]).first_column);
+                        sym_tab->enter_variable(pos, (yyvsp[-3].pool_p), (yyvsp[-1].id)->sym_p);
+                    }
+#line 1525 "./parser/parser.cc"
+    break;
+
+  case 20: /* var_decl: T_ID T_COLON T_ARRAY T_LEFTBRACKET integer T_RIGHTBRACKET type_id T_SEMICOLON  */
+#line 205 "./parser/parser.y"
+                    {
+                        position_information* pos = new position_information((yylsp[-7]).first_line, (yylsp[-7]).first_column);
+                        sym_tab->enter_array(pos, (yyvsp[-7].pool_p), (yyvsp[-1].id)->sym_p, (yyvsp[-3].integer)->value);
+                    }
+#line 1534 "./parser/parser.cc"
+    break;
+
   case 21: /* var_decl: T_ID T_COLON T_ARRAY T_LEFTBRACKET const_id T_RIGHTBRACKET type_id T_SEMICOLON  */
-#line 192 "./parser/parser.y"
+#line 210 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-7]).first_line, (yylsp[-7]).first_column);
                         
@@ -1537,11 +1555,11 @@ yyreduce:
                             }
                         }
                     }
-#line 1541 "./parser/parser.cc"
+#line 1559 "./parser/parser.cc"
     break;
 
   case 26: /* subprog_decl: proc_decl subprog_part comp_stmt T_SEMICOLON  */
-#line 223 "./parser/parser.y"
+#line 241 "./parser/parser.y"
                     {
                         symbol *env = sym_tab->get_symbol((yyvsp[-3].procedure_head)->sym_p);
 
@@ -1554,19 +1572,36 @@ yyreduce:
                             cout << (ast_statement_list *)(yyvsp[-1].statement_list) << endl;
                         }
 
-                        // TODO: Implement optimizer
+                        if(optimize) {
+                            optimizer->do_optimize((yyvsp[-1].statement_list));
+                            if(print_ast) {
+                                cout << "\nOptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                cout << (ast_statement_list*)(yyvsp[-1].statement_list) << endl;
+                            }
+                        }
 
                         if(error_count == 0) {
-                            // TODO: Implement code generation
+                            if(quads) {
+                                quad_list *q = (yyvsp[-3].procedure_head)->do_quads((yyvsp[-1].statement_list));
+                                if(print_quads) {
+                                    cout << "\nQuad list for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    cout << (quad_list *)q << endl;
+                                }
+
+                                if(assembler) {
+                                    cout << "Generating assembler for procedure \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    code_gen->generate_assembler(q, env);
+                                }
+                            }
                         }
 
                         sym_tab->close_scope();
                     }
-#line 1566 "./parser/parser.cc"
+#line 1601 "./parser/parser.cc"
     break;
 
   case 27: /* subprog_decl: func_decl subprog_part comp_stmt T_SEMICOLON  */
-#line 244 "./parser/parser.y"
+#line 279 "./parser/parser.y"
                     {
                         symbol *env = sym_tab->get_symbol((yyvsp[-3].function_head)->sym_p);
 
@@ -1579,36 +1614,53 @@ yyreduce:
                             cout << (ast_statement_list *)(yyvsp[-1].statement_list) << endl;
                         }
 
-                        // TODO: Implement optimizer
+                        if(optimize) {
+                            optimizer->do_optimize((yyvsp[-1].statement_list));
+                            if(print_ast) {
+                                cout << "\nOptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                cout << (ast_statement_list*)(yyvsp[-1].statement_list) << endl;
+                            }
+                        }
 
                         if(error_count == 0) {
-                            // TODO: Implement code generation
+                            if(quads) {
+                                quad_list *q = (yyvsp[-3].function_head)->do_quads((yyvsp[-1].statement_list));
+                                if(print_quads) {
+                                    cout << "\nQuad list for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    cout << (quad_list *)q << endl;
+                                }
+
+                                if(assembler) {
+                                    cout << "Generating assembler for procedure \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    code_gen->generate_assembler(q, env);
+                                }
+                            }
                         }
 
                         sym_tab->close_scope();
                     }
-#line 1591 "./parser/parser.cc"
+#line 1643 "./parser/parser.cc"
     break;
 
   case 28: /* proc_decl: proc_head opt_param_list T_SEMICOLON const_part var_part  */
-#line 267 "./parser/parser.y"
+#line 319 "./parser/parser.y"
                     {
                         (yyval.procedure_head) = (yyvsp[-4].procedure_head);
                     }
-#line 1599 "./parser/parser.cc"
+#line 1651 "./parser/parser.cc"
     break;
 
   case 29: /* func_decl: func_head opt_param_list T_COLON type_id T_SEMICOLON const_part var_part  */
-#line 273 "./parser/parser.y"
+#line 325 "./parser/parser.y"
                     {
                         sym_tab->get_symbol((yyvsp[-6].function_head)->sym_p)->type = (yyvsp[-3].id)->sym_p;
                         (yyval.function_head) = (yyvsp[-6].function_head);
                     }
-#line 1608 "./parser/parser.cc"
+#line 1660 "./parser/parser.cc"
     break;
 
   case 30: /* proc_head: T_PROCEDURE T_ID  */
-#line 280 "./parser/parser.y"
+#line 332 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-1]).first_line, (yylsp[-1]).first_column);
                         sym_index proc_loc = sym_tab->enter_procedure(pos, (yyvsp[0].pool_p));
@@ -1621,64 +1673,64 @@ yyreduce:
                         */
                         (yyval.procedure_head) = new ast_procedure_head(pos, proc_loc);
                     }
-#line 1625 "./parser/parser.cc"
+#line 1677 "./parser/parser.cc"
     break;
 
   case 31: /* func_head: T_FUNCTION T_ID  */
-#line 295 "./parser/parser.y"
+#line 347 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-1]).first_line, (yylsp[-1]).first_column);
                         sym_index func_loc = sym_tab->enter_procedure(pos, (yyvsp[0].pool_p));
                         sym_tab->open_scope();
                         (yyval.function_head) = new ast_function_head(pos, func_loc);
                     }
-#line 1636 "./parser/parser.cc"
+#line 1688 "./parser/parser.cc"
     break;
 
   case 32: /* opt_param_list: T_LEFTPAR param_list T_RIGHTPAR  */
-#line 303 "./parser/parser.y"
+#line 355 "./parser/parser.y"
                     {
                         (yyval.expression_list) = (yyvsp[-1].expression_list);
                     }
-#line 1644 "./parser/parser.cc"
+#line 1696 "./parser/parser.cc"
     break;
 
   case 33: /* opt_param_list: T_LEFTPAR error T_RIGHTPAR  */
-#line 307 "./parser/parser.y"
+#line 359 "./parser/parser.y"
                     {
                         yyerrok;
                         (yyval.expression_list) = NULL;
                     }
-#line 1653 "./parser/parser.cc"
+#line 1705 "./parser/parser.cc"
     break;
 
   case 34: /* opt_param_list: %empty  */
-#line 312 "./parser/parser.y"
+#line 364 "./parser/parser.y"
                     {
                         (yyval.expression_list) = NULL;
                     }
-#line 1661 "./parser/parser.cc"
+#line 1713 "./parser/parser.cc"
     break;
 
   case 35: /* param_list: param  */
-#line 318 "./parser/parser.y"
+#line 370 "./parser/parser.y"
                     {
                         /*
                         we use expr_lists for params
                         */
                     }
-#line 1671 "./parser/parser.cc"
+#line 1723 "./parser/parser.cc"
     break;
 
   case 36: /* param_list: param_list T_SEMICOLON param  */
-#line 324 "./parser/parser.y"
+#line 376 "./parser/parser.y"
                     {
                     }
-#line 1678 "./parser/parser.cc"
+#line 1730 "./parser/parser.cc"
     break;
 
   case 37: /* param: T_ID T_COLON type_id  */
-#line 329 "./parser/parser.y"
+#line 381 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-2]).first_line, (yylsp[-2]).first_column);
                         
@@ -1687,20 +1739,20 @@ yyreduce:
                         */
                         sym_index param_loc = sym_tab->enter_parameter(pos, (yyvsp[-2].pool_p), (yyvsp[0].id)->sym_p);
                     }
-#line 1691 "./parser/parser.cc"
+#line 1743 "./parser/parser.cc"
     break;
 
   case 38: /* comp_stmt: stmt_list  */
-#line 340 "./parser/parser.y"
+#line 392 "./parser/parser.y"
                     {
                         // TODO: Look over this, may need begin and end keywords
                         (yyval.statement_list) = (yyvsp[0].statement_list);
                     }
-#line 1700 "./parser/parser.cc"
+#line 1752 "./parser/parser.cc"
     break;
 
   case 39: /* stmt_list: stmt  */
-#line 347 "./parser/parser.y"
+#line 399 "./parser/parser.y"
                     {
                         if((yyvsp[0].statement) != NULL) {
                             (yyval.statement_list) = new ast_statement_list((yyvsp[0].statement)->pos, (yyvsp[0].statement));
@@ -1709,11 +1761,11 @@ yyreduce:
                             (yyval.statement_list) = NULL;
                         }
                     }
-#line 1713 "./parser/parser.cc"
+#line 1765 "./parser/parser.cc"
     break;
 
   case 40: /* stmt_list: stmt_list T_SEMICOLON stmt  */
-#line 356 "./parser/parser.y"
+#line 408 "./parser/parser.y"
                     {
                         if((yyvsp[-2].statement_list) != NULL && (yyvsp[0].statement) != NULL) {
                             (yyval.statement_list) = new ast_statement_list((yyvsp[-2].statement_list)->pos, (yyvsp[0].statement), (yyvsp[-2].statement_list));
@@ -1725,357 +1777,357 @@ yyreduce:
                             (yyval.statement_list) = (yyvsp[-2].statement_list);
                         }
                     }
-#line 1729 "./parser/parser.cc"
+#line 1781 "./parser/parser.cc"
     break;
 
   case 41: /* stmt: T_IF expr stmt_list elseif_list else_part  */
-#line 370 "./parser/parser.y"
+#line 422 "./parser/parser.y"
                     {
                         // TODO: may need end keyword
                         position_information* pos = new position_information((yylsp[-4]).first_line, (yylsp[-4]).first_column);
                         (yyval.statement) = new ast_if(pos, (yyvsp[-3].expression), (yyvsp[-2].statement_list), (yyvsp[-1].elseif_list), (yyvsp[0].statement_list));
                     }
-#line 1739 "./parser/parser.cc"
+#line 1791 "./parser/parser.cc"
     break;
 
   case 42: /* stmt: T_WHILE expr stmt_list  */
-#line 376 "./parser/parser.y"
+#line 428 "./parser/parser.y"
                     {
                         // TODO: may need end keyword
                         position_information* pos = new position_information((yylsp[-2]).first_line, (yylsp[-2]).first_column);
                         (yyval.statement) = new ast_while(pos, (yyvsp[-1].expression), (yyvsp[0].statement_list));
                     }
-#line 1749 "./parser/parser.cc"
+#line 1801 "./parser/parser.cc"
     break;
 
   case 43: /* stmt: proc_id T_LEFTPAR opt_expr_list T_RIGHTPAR  */
-#line 382 "./parser/parser.y"
+#line 434 "./parser/parser.y"
                     {
                         (yyval.statement) = new ast_procedure_call((yyvsp[-3].id)->pos, (yyvsp[-3].id), (yyvsp[-1].expression_list));
                     }
-#line 1757 "./parser/parser.cc"
+#line 1809 "./parser/parser.cc"
     break;
 
   case 44: /* stmt: T_RETURN expr  */
-#line 386 "./parser/parser.y"
+#line 438 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-1]).first_line, (yylsp[-1]).first_column);
                         (yyval.statement) = new ast_return(pos, (yyvsp[0].expression));
                     }
-#line 1766 "./parser/parser.cc"
+#line 1818 "./parser/parser.cc"
     break;
 
   case 45: /* stmt: T_RETURN  */
-#line 391 "./parser/parser.y"
+#line 443 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[0]).first_line, (yylsp[0]).first_column);
                         (yyval.statement) = new ast_return(pos);
                     }
-#line 1775 "./parser/parser.cc"
+#line 1827 "./parser/parser.cc"
     break;
 
   case 46: /* stmt: %empty  */
-#line 396 "./parser/parser.y"
+#line 448 "./parser/parser.y"
                     {
                         (yyval.statement) = NULL;
                     }
-#line 1783 "./parser/parser.cc"
+#line 1835 "./parser/parser.cc"
     break;
 
   case 47: /* rvar: rvar_id  */
-#line 418 "./parser/parser.y"
+#line 470 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].id);
                     }
-#line 1791 "./parser/parser.cc"
+#line 1843 "./parser/parser.cc"
     break;
 
   case 48: /* rvar: array_id T_LEFTBRACKET expr T_RIGHTBRACKET  */
-#line 422 "./parser/parser.y"
+#line 474 "./parser/parser.y"
                     {
                         (yyval.expression) = new ast_indexed((yyvsp[-3].id)->pos, (yyvsp[-3].id), (yyvsp[-1].expression));
                     }
-#line 1799 "./parser/parser.cc"
+#line 1851 "./parser/parser.cc"
     break;
 
   case 49: /* rvar: array_id T_LEFTBRACKET error T_RIGHTBRACKET  */
-#line 426 "./parser/parser.y"
+#line 478 "./parser/parser.y"
                     {
                         yyerrok;
                         (yyval.expression) = NULL;
                     }
-#line 1808 "./parser/parser.cc"
+#line 1860 "./parser/parser.cc"
     break;
 
   case 50: /* elseif_list: elseif_list elseif  */
-#line 433 "./parser/parser.y"
+#line 485 "./parser/parser.y"
                     {
                         (yyval.elseif_list) = new ast_elseif_list((yyvsp[0].elseif)->pos, (yyvsp[0].elseif), (yyvsp[-1].elseif_list));
                     }
-#line 1816 "./parser/parser.cc"
+#line 1868 "./parser/parser.cc"
     break;
 
   case 51: /* elseif_list: %empty  */
-#line 437 "./parser/parser.y"
+#line 489 "./parser/parser.y"
                     {
                         (yyval.elseif_list) = NULL;
                     }
-#line 1824 "./parser/parser.cc"
+#line 1876 "./parser/parser.cc"
     break;
 
   case 52: /* elseif: T_ELSEIF expr stmt_list  */
-#line 443 "./parser/parser.y"
+#line 495 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[-2]).first_line, (yylsp[-2]).first_column);
                         (yyval.elseif) = new ast_elseif(pos, (yyvsp[-1].expression), (yyvsp[0].statement_list));
                     }
-#line 1833 "./parser/parser.cc"
+#line 1885 "./parser/parser.cc"
     break;
 
   case 53: /* else_part: T_ELSE stmt_list  */
-#line 450 "./parser/parser.y"
+#line 502 "./parser/parser.y"
                     {
                         (yyval.statement_list) = (yyvsp[0].statement_list);
                     }
-#line 1841 "./parser/parser.cc"
+#line 1893 "./parser/parser.cc"
     break;
 
   case 54: /* else_part: %empty  */
-#line 454 "./parser/parser.y"
+#line 506 "./parser/parser.y"
                     {
                         (yyval.statement_list) = NULL;
                     }
-#line 1849 "./parser/parser.cc"
+#line 1901 "./parser/parser.cc"
     break;
 
   case 55: /* opt_expr_list: expr_list  */
-#line 460 "./parser/parser.y"
+#line 512 "./parser/parser.y"
                     {
                         (yyval.expression_list) = (yyvsp[0].expression_list);
                     }
-#line 1857 "./parser/parser.cc"
+#line 1909 "./parser/parser.cc"
     break;
 
   case 56: /* opt_expr_list: %empty  */
-#line 464 "./parser/parser.y"
+#line 516 "./parser/parser.y"
                     {
                         (yyval.expression_list) = NULL;
                     }
-#line 1865 "./parser/parser.cc"
+#line 1917 "./parser/parser.cc"
     break;
 
   case 57: /* expr_list: expr  */
-#line 470 "./parser/parser.y"
+#line 522 "./parser/parser.y"
                     {
                         (yyval.expression_list) = new ast_expression_list((yyvsp[0].expression)->pos, (yyvsp[0].expression));
                     }
-#line 1873 "./parser/parser.cc"
+#line 1925 "./parser/parser.cc"
     break;
 
   case 58: /* expr_list: expr_list T_COMMA expr  */
-#line 474 "./parser/parser.y"
+#line 526 "./parser/parser.y"
                     {
                         (yyval.expression_list) = new ast_expression_list((yyvsp[-2].expression_list)->pos, (yyvsp[0].expression), (yyvsp[-2].expression_list));
                     }
-#line 1881 "./parser/parser.cc"
+#line 1933 "./parser/parser.cc"
     break;
 
   case 59: /* expr: simple_expr  */
-#line 480 "./parser/parser.y"
+#line 532 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].expression);
                     }
-#line 1889 "./parser/parser.cc"
+#line 1941 "./parser/parser.cc"
     break;
 
   case 60: /* expr: expr T_EQ simple_expr  */
-#line 484 "./parser/parser.y"
+#line 536 "./parser/parser.y"
                     {
                         // $$ = new ast_equal($1->pos, $1, $3);
                     }
-#line 1897 "./parser/parser.cc"
+#line 1949 "./parser/parser.cc"
     break;
 
   case 61: /* expr: %empty  */
-#line 488 "./parser/parser.y"
+#line 540 "./parser/parser.y"
                     {
                         // TODO: not eq
                     }
-#line 1905 "./parser/parser.cc"
+#line 1957 "./parser/parser.cc"
     break;
 
   case 62: /* expr: expr T_LESSTHAN simple_expr  */
-#line 492 "./parser/parser.y"
+#line 544 "./parser/parser.y"
                     {
                         // $$ = new ast_less_than($1->pos, $1, $3);
                     }
-#line 1913 "./parser/parser.cc"
+#line 1965 "./parser/parser.cc"
     break;
 
   case 63: /* expr: expr T_GREATERTHAN simple_expr  */
-#line 496 "./parser/parser.y"
+#line 548 "./parser/parser.y"
                     {
                         // $$ = new ast_greater_than($1->pos, $1, $3);
                     }
-#line 1921 "./parser/parser.cc"
+#line 1973 "./parser/parser.cc"
     break;
 
   case 64: /* simple_expr: term  */
-#line 502 "./parser/parser.y"
+#line 554 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].expression);
                     }
-#line 1929 "./parser/parser.cc"
+#line 1981 "./parser/parser.cc"
     break;
 
   case 65: /* simple_expr: T_ADD term  */
-#line 506 "./parser/parser.y"
+#line 558 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].expression);
                     }
-#line 1937 "./parser/parser.cc"
+#line 1989 "./parser/parser.cc"
     break;
 
   case 66: /* simple_expr: T_SUB term  */
-#line 510 "./parser/parser.y"
+#line 562 "./parser/parser.y"
                     {
                         // TODO: uminus
                     }
-#line 1945 "./parser/parser.cc"
+#line 1997 "./parser/parser.cc"
     break;
 
   case 67: /* simple_expr: %empty  */
-#line 514 "./parser/parser.y"
+#line 566 "./parser/parser.y"
                     {
                         // TODO: or
                     }
-#line 1953 "./parser/parser.cc"
+#line 2005 "./parser/parser.cc"
     break;
 
   case 68: /* simple_expr: simple_expr T_ADD term  */
-#line 518 "./parser/parser.y"
+#line 570 "./parser/parser.y"
                     {
                         (yyval.expression) = new ast_add((yyvsp[-2].expression)->pos, (yyvsp[-2].expression), (yyvsp[0].expression));
                     }
-#line 1961 "./parser/parser.cc"
+#line 2013 "./parser/parser.cc"
     break;
 
   case 69: /* simple_expr: simple_expr T_SUB term  */
-#line 522 "./parser/parser.y"
+#line 574 "./parser/parser.y"
                     {
                         (yyval.expression) = new ast_sub((yyvsp[-2].expression)->pos, (yyvsp[-2].expression), (yyvsp[0].expression));
                     }
-#line 1969 "./parser/parser.cc"
+#line 2021 "./parser/parser.cc"
     break;
 
   case 70: /* term: factor  */
-#line 528 "./parser/parser.y"
+#line 580 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].expression);
                     }
-#line 1977 "./parser/parser.cc"
+#line 2029 "./parser/parser.cc"
     break;
 
   case 71: /* term: %empty  */
-#line 532 "./parser/parser.y"
+#line 584 "./parser/parser.y"
                     {
                         // TODO: and, idiv/rdiv, mod
                     }
-#line 1985 "./parser/parser.cc"
+#line 2037 "./parser/parser.cc"
     break;
 
   case 72: /* term: term T_MULT factor  */
-#line 536 "./parser/parser.y"
+#line 588 "./parser/parser.y"
                     {
                         (yyval.expression) = new ast_mult((yyvsp[-2].expression)->pos, (yyvsp[-2].expression), (yyvsp[0].expression));
                     }
-#line 1993 "./parser/parser.cc"
+#line 2045 "./parser/parser.cc"
     break;
 
   case 73: /* term: term T_DIV factor  */
-#line 540 "./parser/parser.y"
+#line 592 "./parser/parser.y"
                     {
                         (yyval.expression) = new ast_div((yyvsp[-2].expression)->pos, (yyvsp[-2].expression), (yyvsp[0].expression));
                     }
-#line 2001 "./parser/parser.cc"
+#line 2053 "./parser/parser.cc"
     break;
 
   case 74: /* factor: rvar  */
-#line 546 "./parser/parser.y"
+#line 598 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].expression);
                     }
-#line 2009 "./parser/parser.cc"
+#line 2061 "./parser/parser.cc"
     break;
 
   case 75: /* factor: func_call  */
-#line 550 "./parser/parser.y"
+#line 602 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].function_call);
                     }
-#line 2017 "./parser/parser.cc"
+#line 2069 "./parser/parser.cc"
     break;
 
   case 76: /* factor: integer  */
-#line 554 "./parser/parser.y"
+#line 606 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].integer);
                     }
-#line 2025 "./parser/parser.cc"
+#line 2077 "./parser/parser.cc"
     break;
 
   case 77: /* factor: real  */
-#line 558 "./parser/parser.y"
+#line 610 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[0].real);
                     }
-#line 2033 "./parser/parser.cc"
+#line 2085 "./parser/parser.cc"
     break;
 
   case 78: /* factor: %empty  */
-#line 562 "./parser/parser.y"
+#line 614 "./parser/parser.y"
                     {
                         // TODO: not
                     }
-#line 2041 "./parser/parser.cc"
+#line 2093 "./parser/parser.cc"
     break;
 
   case 79: /* factor: T_LEFTPAR expr T_RIGHTPAR  */
-#line 566 "./parser/parser.y"
+#line 618 "./parser/parser.y"
                     {
                         (yyval.expression) = (yyvsp[-1].expression);
                     }
-#line 2049 "./parser/parser.cc"
+#line 2101 "./parser/parser.cc"
     break;
 
   case 80: /* func_call: func_id T_LEFTPAR opt_expr_list T_RIGHTPAR  */
-#line 572 "./parser/parser.y"
+#line 624 "./parser/parser.y"
                     {
                         (yyval.function_call) = new ast_function_call((yyvsp[-3].id)->pos, (yyvsp[-3].id), (yyvsp[-1].expression_list));
                     }
-#line 2057 "./parser/parser.cc"
+#line 2109 "./parser/parser.cc"
     break;
 
   case 81: /* integer: T_INT  */
-#line 578 "./parser/parser.y"
+#line 630 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[0]).first_line, (yylsp[0]).first_column);
                         (yyval.integer) = new ast_int(pos, (yyvsp[0].ival));
                     }
-#line 2066 "./parser/parser.cc"
+#line 2118 "./parser/parser.cc"
     break;
 
   case 82: /* real: T_REAL  */
-#line 585 "./parser/parser.y"
+#line 637 "./parser/parser.y"
                     {
                         position_information* pos = new position_information((yylsp[0]).first_line, (yylsp[0]).first_column);
                         (yyval.real) = new ast_real(pos, (yyvsp[0].rval));
                     }
-#line 2075 "./parser/parser.cc"
+#line 2127 "./parser/parser.cc"
     break;
 
   case 83: /* type_id: id  */
-#line 592 "./parser/parser.y"
+#line 644 "./parser/parser.y"
                     {
                         if(sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_TYPE) {
                             type_error((yyvsp[0].id)->pos) << "not declared "
@@ -2084,11 +2136,11 @@ yyreduce:
                         }
                         (yyval.id) = (yyvsp[0].id);
                     }
-#line 2088 "./parser/parser.cc"
+#line 2140 "./parser/parser.cc"
     break;
 
   case 84: /* const_id: id  */
-#line 603 "./parser/parser.y"
+#line 655 "./parser/parser.y"
                     {
                         if(sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_CONST) {
                             type_error((yyvsp[0].id)->pos) << "not declared "
@@ -2097,11 +2149,11 @@ yyreduce:
                         }
                         (yyval.id) = (yyvsp[0].id);
                     }
-#line 2101 "./parser/parser.cc"
+#line 2153 "./parser/parser.cc"
     break;
 
   case 85: /* rvar_id: id  */
-#line 627 "./parser/parser.y"
+#line 679 "./parser/parser.y"
                     {
                         if(sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_VAR && sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_PARAM && sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_CONST ) {
                             type_error((yyvsp[0].id)->pos) << "not declared "
@@ -2110,11 +2162,11 @@ yyreduce:
                         }
                         (yyval.id) = (yyvsp[0].id);
                     }
-#line 2114 "./parser/parser.cc"
+#line 2166 "./parser/parser.cc"
     break;
 
   case 86: /* proc_id: id  */
-#line 638 "./parser/parser.y"
+#line 690 "./parser/parser.y"
                     {
                         if(sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_PROC) {
                             type_error((yyvsp[0].id)->pos) << "not declared "
@@ -2123,11 +2175,11 @@ yyreduce:
                         }
                         (yyval.id) = (yyvsp[0].id);
                     }
-#line 2127 "./parser/parser.cc"
+#line 2179 "./parser/parser.cc"
     break;
 
   case 87: /* func_id: id  */
-#line 649 "./parser/parser.y"
+#line 701 "./parser/parser.y"
                     {
                         if(sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_FUNC) {
                             type_error((yyvsp[0].id)->pos) << "not declared "
@@ -2136,11 +2188,11 @@ yyreduce:
                         }
                         (yyval.id) = (yyvsp[0].id);
                     }
-#line 2140 "./parser/parser.cc"
+#line 2192 "./parser/parser.cc"
     break;
 
   case 88: /* array_id: id  */
-#line 660 "./parser/parser.y"
+#line 712 "./parser/parser.y"
                     {
                         if(sym_tab->get_symbol_tag((yyvsp[0].id)->sym_p) != SYM_ARRAY) {
                             type_error((yyvsp[0].id)->pos) << "not declared "
@@ -2149,11 +2201,11 @@ yyreduce:
                         }
                         (yyval.id) = (yyvsp[0].id);
                     }
-#line 2153 "./parser/parser.cc"
+#line 2205 "./parser/parser.cc"
     break;
 
   case 89: /* id: T_ID  */
-#line 671 "./parser/parser.y"
+#line 723 "./parser/parser.y"
                     {
                         sym_index sym_p;
                         position_information* pos = new position_information((yylsp[0]).first_line, (yylsp[0]).first_column);
@@ -2169,11 +2221,11 @@ yyreduce:
                         (yyval.id) = new ast_id(pos, sym_p);
                         (yyval.id)->type = sym_tab->get_symbol_type(sym_p);
                     }
-#line 2173 "./parser/parser.cc"
+#line 2225 "./parser/parser.cc"
     break;
 
 
-#line 2177 "./parser/parser.cc"
+#line 2229 "./parser/parser.cc"
 
       default: break;
     }
@@ -2371,4 +2423,4 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 688 "./parser/parser.y"
+#line 740 "./parser/parser.y"

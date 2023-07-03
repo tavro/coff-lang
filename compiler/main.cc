@@ -13,9 +13,15 @@ extern int error_count;
 extern bool yydebug;
 
 bool assembler_trace = false;
+bool assembler = true;
+
 bool print_ast = false;
+bool print_quads = false;
+
 bool type_check = true;
-// TODO: add more flag variables
+
+bool optimize = true;
+bool quads = true;
 
 void usage(char *program_name) {
     cerr << "Usage:\n"
@@ -25,21 +31,25 @@ void usage(char *program_name) {
          << "  -h: print this help message\n"
          << "  -a: print abstract syntax tree\n"
          << "  -c: disable type checking\n"
+         << "  -d: turn on parser debugging\n"
+         << "  -f: turn off optimization\n"
+         << "  -p: do not generate quadruples\n"
+         << "  -q: print quad lists\n"
+         << "  -s: do not generate assembler code\n"
          << "  -t: include traces in assembler code\n"
          << "  -y: print symbol table\n";
-    // TODO: add more flags
     exit(1);
 }
 
 int main(int argc, char **argv) {
-    char options[] = "actyh"; // TODO: add more flags
+    char options[] = "acdfpqstyh";
     int option;
     bool print_symtab = false;
 
     extern FILE *yyin;
 
     while ((option = getopt(argc, argv, options)) != EOF) {
-        switch (option) { // TODO: add more flags
+        switch (option) {
             case 'a':
                 cout << "an AST will be printed for each block\n";
                 print_ast = true;
@@ -47,6 +57,26 @@ int main(int argc, char **argv) {
             case 'c':
                 cout << "no type checking will be performed\n";
                 type_check = false;
+                break;
+            case 'd':
+                cout << "parser debugging turned on\n";
+                yydebug = true;
+                break;
+            case 'f':
+                cout << "no optimization will be performed\n";
+                optimize = false;
+                break;
+            case 'p':
+                cout << "no quadruples will be generated\n";
+                quads = false;
+                break;
+            case 'q':
+                cout << "quad lists will be printed for each block\n";
+                print_quads = true;
+                break;
+            case 's':
+                cout << "no assembler code will be generated\n";
+                assembler = false;
                 break;
             case 't':
                 cout << "assembler code will contain quad labels\n";

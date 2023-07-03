@@ -69,7 +69,7 @@ public:
     ast_node(position_information *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &) = 0;
 
     friend ostream &operator<<(ostream &, ast_node *);
@@ -83,7 +83,7 @@ public:
     ast_statement(position_information *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &) = 0;
 };
 
@@ -97,7 +97,7 @@ public:
     ast_expression(position_information *, sym_index);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &) = 0;
 
     virtual ast_int *get_ast_int() {
@@ -136,7 +136,7 @@ public:
     ast_binary_operation(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &) = 0;
 
     virtual ast_binary_operation *get_ast_binary_operation() {
@@ -154,7 +154,7 @@ public:
     ast_lval(position_information *, sym_index);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &) = 0;
     // TODO: Code generation
 };
@@ -169,7 +169,7 @@ public:
     ast_elseif(position_information *, ast_expression *, ast_statement_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
     virtual void generate_quads_and_jump(quad_list &, int);
 };
@@ -186,7 +186,7 @@ public:
     ast_expression_list(position_information *, ast_expression *, ast_expression_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
     virtual void generate_param_list(quad_list &, parameter_symbol *, int *);
 };
@@ -203,7 +203,7 @@ public:
     ast_statement_list(position_information *, ast_statement *, ast_statement_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -219,7 +219,7 @@ public:
     ast_elseif_list(position_information *, ast_elseif *, ast_elseif_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
     virtual void generate_quads_and_jump(quad_list &, int);
 };
@@ -233,7 +233,7 @@ public:
 
     ast_function_head(position_information *, sym_index);
 
-    // virtual void optimize(); // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
     quad_list *do_quads(ast_statement_list *s);
 };
@@ -247,7 +247,7 @@ public:
 
     ast_procedure_head(position_information *, sym_index);
 
-    // virtual void optimize(); // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
     quad_list *do_quads(ast_statement_list *s);
 };
@@ -263,7 +263,7 @@ public:
     ast_procedure_call(position_information *, ast_id *, ast_expression_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -278,7 +278,7 @@ public:
     ast_while(position_information *, ast_expression *, ast_statement_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -295,7 +295,7 @@ public:
     ast_if(position_information *, ast_expression *, ast_statement_list *, ast_elseif_list *, ast_statement_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -310,7 +310,7 @@ public:
     ast_return(position_information *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -325,7 +325,7 @@ public:
     ast_function_call(position_information *, ast_id *, ast_expression_list *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -341,7 +341,7 @@ public:
     ast_int(position_information *, long);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 
     virtual ast_int *get_ast_int() {
@@ -358,7 +358,7 @@ public:
     ast_real(position_information *, double);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 
     virtual ast_real *get_ast_real() {
@@ -375,7 +375,7 @@ public:
 
     ast_cast(position_information *, ast_expression *);
 
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 
     virtual ast_cast *get_ast_cast() {
@@ -393,7 +393,7 @@ public:
     ast_equal(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -409,7 +409,7 @@ public:
     ast_less_than(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -423,7 +423,7 @@ public:
     ast_greater_than(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 };
 
@@ -435,7 +435,7 @@ public:
     ast_add(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();   // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 
     virtual ast_add *get_ast_binary_operation() {
@@ -451,7 +451,7 @@ public:
     ast_sub(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();   // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 
     virtual ast_sub *get_ast_binary_operation() {
@@ -470,7 +470,7 @@ public:
     ast_mult(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();   // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 
     virtual ast_mult *get_ast_binary_operation() {
@@ -486,7 +486,7 @@ public:
     ast_div(position_information *, ast_expression *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();   // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
 
     virtual ast_div *get_ast_binary_operation() {
@@ -508,7 +508,7 @@ public:
     ast_id(position_information *, sym_index);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
     // TODO: code generation
 
@@ -528,7 +528,7 @@ public:
     ast_indexed(position_information *, ast_id *, ast_expression *);
 
     virtual sym_index type_check(); // TODO: Implement semantic analyser
-    // virtual void optimize();        // TODO: Implement optimizer
+    virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
     // TODO: code generation
 };

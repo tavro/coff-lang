@@ -6,6 +6,10 @@ semantic.o: semantics/semantic.cc semantics/semantic.hh \
  semantics/../parser/ast.hh semantics/../parser/../symtab.hh \
  semantics/../parser/../error.hh semantics/../parser/../codegen/quads.hh \
  semantics/../parser/../codegen/../parser/ast.hh
+optimize.o: optimizer/optimize.cc optimizer/optimize.hh \
+ optimizer/../parser/ast.hh optimizer/../parser/../symtab.hh \
+ optimizer/../parser/../error.hh optimizer/../parser/../codegen/quads.hh \
+ optimizer/../parser/../codegen/../parser/ast.hh
 quads.o: codegen/quads.cc codegen/../symtab.hh codegen/../error.hh \
  codegen/../parser/ast.hh codegen/../parser/../symtab.hh \
  codegen/../parser/../codegen/quads.hh \

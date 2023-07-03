@@ -91,7 +91,7 @@ void code_generator::epilogue(symbol *old_env) {
 }
 
 void code_generator::find(sym_index sym_p, int *level, int *offset) {
-    symbol *sym = sym_tab->gesymbol(sym_p);
+    symbol *sym = sym_tab->get_symbol(sym_p);
     *level = sym->level;
 
     sym_type tag = sym->tag;

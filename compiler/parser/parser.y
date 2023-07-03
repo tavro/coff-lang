@@ -2,22 +2,23 @@
 #include <iostream>
 #include "../semantics/semantic.hh"
 #include "../codegen/codegen.hh"
-
-// TODO: Write oprimizer
+#include "../optimizer/optimize.hh"
 
 extern char *yytext;
 extern int error_count;         // defined in error.cc
 extern symbol_table *sym_tab;   // defined in symtab.cc
 extern semantic *type_checker;
-
-// TODO: code generator
+extern code_generator *code_gen;
 
 extern int yylex();
 extern void yyerror(string);
 
 extern bool print_ast;
+extern bool print_quads;
 extern bool type_check;
-// TODO: more flags
+extern bool optimize;
+extern bool quads;
+extern bool assembler;
 
 #define YYDEBUG 1
 %}
@@ -93,10 +94,27 @@ program             : prog_decl subprog_part comp_stmt T_DOT
                             cout << (ast_statement_list *)$3 << endl;
                         }
 
-                        // TODO: Implement optimizer
+                        if(optimize) {
+                            optimizer->do_optimize($3);
+                            if(print_ast) {
+                                cout << "\nOptimized AST for global level" << endl;
+                                cout << (ast_statement_list *)$3 << endl;
+                            }
+                        }
 
                         if(error_count == 0) {
-                            // TODO: Implement code generation
+                            if(quads) {
+                                quad_list *q = $1->do_quads($3);
+                                if(print_quads) {
+                                    cout << "\nQuad list for global level" << endl;
+                                    cout << (quad_list *)q << endl;
+                                }
+
+                                if(assembler) {
+                                    cout << "Generating assembler, global level" << endl;
+                                    code_gen->generate_assembler(q, env);
+                                }
+                            }
                         }
                         else {
                             cout << "Found " << error_count << " errors. "
@@ -232,10 +250,27 @@ subprog_decl        : proc_decl subprog_part comp_stmt T_SEMICOLON
                             cout << (ast_statement_list *)$3 << endl;
                         }
 
-                        // TODO: Implement optimizer
+                        if(optimize) {
+                            optimizer->do_optimize($3);
+                            if(print_ast) {
+                                cout << "\nOptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                cout << (ast_statement_list*)$3 << endl;
+                            }
+                        }
 
                         if(error_count == 0) {
-                            // TODO: Implement code generation
+                            if(quads) {
+                                quad_list *q = $1->do_quads($3);
+                                if(print_quads) {
+                                    cout << "\nQuad list for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    cout << (quad_list *)q << endl;
+                                }
+
+                                if(assembler) {
+                                    cout << "Generating assembler for procedure \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    code_gen->generate_assembler(q, env);
+                                }
+                            }
                         }
 
                         sym_tab->close_scope();
@@ -253,10 +288,27 @@ subprog_decl        : proc_decl subprog_part comp_stmt T_SEMICOLON
                             cout << (ast_statement_list *)$3 << endl;
                         }
 
-                        // TODO: Implement optimizer
+                        if(optimize) {
+                            optimizer->do_optimize($3);
+                            if(print_ast) {
+                                cout << "\nOptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                cout << (ast_statement_list*)$3 << endl;
+                            }
+                        }
 
                         if(error_count == 0) {
-                            // TODO: Implement code generation
+                            if(quads) {
+                                quad_list *q = $1->do_quads($3);
+                                if(print_quads) {
+                                    cout << "\nQuad list for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    cout << (quad_list *)q << endl;
+                                }
+
+                                if(assembler) {
+                                    cout << "Generating assembler for procedure \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
+                                    code_gen->generate_assembler(q, env);
+                                }
+                            }
                         }
 
                         sym_tab->close_scope();

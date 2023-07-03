@@ -3,9 +3,9 @@ CFLAGS	=	-std=c++11 -ggdb3 -Wall -Woverloaded-virtual -pedantic -pie
 GCFLAGS =	-std=c++11 -g -Wall -Wno-unused-function -Wno-unused-variable
 DPFLAGS =	-MM
 
-BASESRC =	symbol.cc symtab.cc ./parser/ast.cc ./semantics/semantic.cc ./codegen/quads.cc ./codegen/codegen.cc error.cc main.cc
+BASESRC =	symbol.cc symtab.cc ./parser/ast.cc ./semantics/semantic.cc ./optimizer/optimize.cc ./codegen/quads.cc ./codegen/codegen.cc error.cc main.cc
 SOURCES =	$(BASESRC) ./parser/parser.cc scanner.cc
-BASEHDR =	symtab.hh error.hh ./parser/ast.hh ./semantics/semantic.hh ./codegen/quads.hh ./codegen/codegen.hh
+BASEHDR =	symtab.hh error.hh ./parser/ast.hh ./semantics/semantic.hh ./optimizer/optimize.hh ./codegen/quads.hh ./codegen/codegen.hh
 HEADERS =	$(BASEHDR) ./parser/parser.hh
 OBJECTS =	$(SOURCES:%.cc=%.o)
 OUTFILE =	compiler
@@ -53,6 +53,9 @@ scanner.o : scanner.cc
 
 ./codegen/codegen.o: ./codegen/codegen.cc
 	$(CC) $(GCFLAGS) -c -o ./codegen/codegen.o ./codegen/codegen.cc
+
+./optimizer/optimize.o: ./optimizer/optimize.cc
+	$(CC) $(GCFLAGS) -c -o ./optimizer/optimize.o ./optimizer/optimize.cc
 
 .cc.o: $(DPFILE)
 	$(CC) $(CFLAGS) -c $<
