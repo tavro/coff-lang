@@ -17,7 +17,7 @@ const int STACK_WIDTH = 8;
 class code_generator {
 private:
     string reg[3];
-    ostream out;
+    ofstream out;
 
     int align(int);
 

@@ -1,9 +1,19 @@
 symbol.o: symbol.cc symtab.hh error.hh
 symtab.o: symtab.cc symtab.hh error.hh
-ast.o: parser/ast.cc parser/ast.hh parser/../symtab.hh parser/../error.hh
+ast.o: parser/ast.cc parser/ast.hh parser/../symtab.hh parser/../error.hh \
+ parser/../codegen/quads.hh parser/../codegen/../parser/ast.hh
 semantic.o: semantics/semantic.cc semantics/semantic.hh \
  semantics/../parser/ast.hh semantics/../parser/../symtab.hh \
- semantics/../parser/../error.hh
+ semantics/../parser/../error.hh semantics/../parser/../codegen/quads.hh \
+ semantics/../parser/../codegen/../parser/ast.hh
+quads.o: codegen/quads.cc codegen/../symtab.hh codegen/../error.hh \
+ codegen/../parser/ast.hh codegen/../parser/../symtab.hh \
+ codegen/../parser/../codegen/quads.hh \
+ codegen/../parser/../codegen/../parser/ast.hh codegen/quads.hh
+codegen.o: codegen/codegen.cc codegen/../symtab.hh codegen/../error.hh \
+ codegen/quads.hh codegen/../parser/ast.hh codegen/../parser/../symtab.hh \
+ codegen/../parser/../codegen/quads.hh codegen/codegen.hh
 error.o: error.cc error.hh
 main.o: main.cc parser/ast.hh parser/../symtab.hh parser/../error.hh \
+ parser/../codegen/quads.hh parser/../codegen/../parser/ast.hh \
  parser/parser.hh

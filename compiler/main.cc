@@ -12,6 +12,7 @@ using namespace std;
 extern int error_count;
 extern bool yydebug;
 
+bool assembler_trace = false;
 bool print_ast = false;
 bool type_check = true;
 // TODO: add more flag variables
@@ -24,13 +25,14 @@ void usage(char *program_name) {
          << "  -h: print this help message\n"
          << "  -a: print abstract syntax tree\n"
          << "  -c: disable type checking\n"
+         << "  -t: include traces in assembler code\n"
          << "  -y: print symbol table\n";
     // TODO: add more flags
     exit(1);
 }
 
 int main(int argc, char **argv) {
-    char options[] = "acyh"; // TODO: add more flags
+    char options[] = "actyh"; // TODO: add more flags
     int option;
     bool print_symtab = false;
 
@@ -45,6 +47,10 @@ int main(int argc, char **argv) {
             case 'c':
                 cout << "no type checking will be performed\n";
                 type_check = false;
+                break;
+            case 't':
+                cout << "assembler code will contain quad labels\n";
+                assembler_trace = true;
                 break;
             case 'y':
                 cout << "symbol table will be printed after compilation\n";

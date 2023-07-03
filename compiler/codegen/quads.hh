@@ -44,7 +44,7 @@ typedef enum {
     q_jmp,          // int, -, -
     q_jmpf,         // int, sym, -
     q_param,        // sym, -, -
-    q_labl,         // int, -, -
+    q_label,        // int, -, -
     q_nop,          // -, -, -
 } quad_op_type;
 
@@ -89,7 +89,7 @@ private:
 public:
     quad_list_iterator(quad_list *q_list);
 
-    quadtuple *get_current();
+    quadruple *get_current();
     quadruple *get_next();
 };
 

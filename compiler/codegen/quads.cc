@@ -125,85 +125,431 @@ sym_index ast_div::generate_quads(quad_list &q) {
 // TODO: binary relation
 
 sym_index ast_equal::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    // TODO: Implement binary relation  
 }
 
 // TODO: not equal
 
-sym_index ast_less::generate_quads(quad_list &q) {
-    // TODO: Implement   
+sym_index ast_less_than::generate_quads(quad_list &q) {
+    // TODO: Implement binary relation
 }
 
-sym_index ast_greater::generate_quads(quad_list &q) {
-    // TODO: Implement   
+sym_index ast_greater_than::generate_quads(quad_list &q) {
+    // TODO: Implement binary relation  
 }
 
 // TODO: assignment
 
 void ast_expression_list::generate_param_list(quad_list &q, parameter_symbol *last_param, int *nr_params) {
-    // TODO: Implement
+    USE_Q;
+
+    sym_index param = last_expr->generate_quads(q);
+    q += new quadruple(q_param, param, NULL_SYM, NULL_SYM);
+    (*nr_params)++;
+
+    if(preceding) {
+        preceding->generate_param_list(q, NULL, nr_params);
+    }
 }
 
 sym_index ast_procedure_call::generate_quads(quad_list &q) {
-    // TODO: Implement
+    USE_Q;
+
+    int nr_params = 0;
+    if(param_list) {
+        param_list->generate_param_list(q, NULL, &nr_params);
+    }
+
+    q += new quadruple(q_call, id->sym_p, nr_params, NULL_SYM);
+    return NULL_SYM;
 }
 
 sym_index ast_function_call::generate_quads(quad_list &q) {
-    // TODO: Implement
+    USE_Q;
+
+    int nr_params = 0;
+    sym_index address;
+
+    if(type == int_type) {
+        address = sym_tab->gen_temp_var(int_type);
+    }
+    else {
+        address = sym_tab->gen_temp_var(real_type);
+    }
+
+    if(param_list) {
+        param_list->generate_param_list(q, NULL, &nr_params);
+    }
+
+    q += new quadruple(q_call, id->sym_p, nr_params, address);
+    return address;
 }
 
 sym_index ast_while::generate_quads(quad_list &q) {
-    // TODO: Implement
+    int top = sym_tab->get_next_label();
+    int bottom = sym_tab->get_next_label();
+
+    q += new quadruple(q_label, top, NULL_SYM, NULL_SYM);
+
+    sym_index pos = condition->generate_quads(q);
+    q += new quadruple(q_jmpf, bottom, pos, NULL_SYM);
+
+    pos = body->generate_quads(q);
+    q += new quadruple(q_jmp, top, NULL_SYM, NULL_SYM);
+
+    q += new quadruple(q_label, bottom, NULL_SYM, NULL_SYM);
+
+    return NULL_SYM;
 }
 
 void ast_elseif::generate_quads_and_jump(quad_list &q, int label) {
-    // TODO: Implement
+    USE_Q;
+
+    int bottom = sym_tab->get_next_label();
+
+    sym_index pos = condition->generate_quads(q);
+    q += new quadruple(q_jmpf, bottom, pos, NULL_SYM);
+
+    if (body) {
+        pos = body->generate_quads(q);
+    }
+
+    q += new quadruple(q_jmp, label, pos, NULL_SYM);
+    q += new quadruple(q_label, bottom, NULL_SYM, NULL_SYM);
 }
 
 void ast_elseif_list::generate_quads_and_jump(quad_list &q, int label) {
-    // TODO: Implement
+    USE_Q;
+
+    if(preceding) {
+        preceding->generate_quads_and_jump(q, label);
+    }
+    last_elseif->generate_quads_and_jump(q, label);
 }
 
 sym_index ast_if::generate_quads(quad_list &q) {
-    // TODO: Implement
+    USE_Q;
+
+    int elseif = sym_tab->get_next_label();
+    int bottom;
+
+    if(elseif_list || else_body) {
+        bottom = sym_tab->get_next_label();
+    }
+
+    sym_index pos = condition->generate_quads(q);
+    q += new quadruple(q_jmpf, elseif, pos, NULL_SYM);
+
+    if (body) {
+        pos = body->generate_quads(q);
+    }
+
+    if (elseif_list || else_body) {
+        q += new quadruple(q_jmp, bottom, pos, NULL_SYM);
+    }
+
+    q += new quadruple(q_label, elseif, NULL_SYM, NULL_SYM);
+    if(elseif_list) {
+        elseif_list->generate_quads_and_jump(q, bottom);
+    }
+
+    if(else_body) {
+        else_body->generate_quads(q);
+    }
+
+    if(elseif_list || else_body) {
+        q += new quadruple(q_label, bottom, NULL_SYM, NULL_SYM);
+    }
+
+    return NULL_SYM;
 }
 
 sym_index ast_return::generate_quads(quad_list &q) {
-    // TODO: Implement
+    USE_Q;
+
+    if(value) {
+        sym_index val = value->generate_quads(q);
+        sym_index val_type = sym_tab->get_symbol_type(val);
+
+        if(val_type == int_type) {
+            q += new quadruple(q_ireturn, q.last_label, val, NULL_SYM);
+        }
+        else if(val_type == real_type) {
+            q += new quadruple(q_rreturn, q.last_label, val, NULL_SYM);
+        }
+    }
+    else {
+        q += new quadruple(q_jmp, q.last_label, NULL_SYM, NULL_SYM);
+    }
+
+    return NULL_SYM;
 }
 
 sym_index ast_indexed::generate_quads(quad_list &q) {
-    // TODO: Implement
+    USE_Q;
+
+    sym_index sym_ind = index->generate_quads(q);
+    sym_index address;
+
+    if(sym_tab->get_symbol_type(sym_ind) == int_type) {
+        address = sym_tab->gen_temp_var(int_type);
+        q += new quadruple(q_irindex, id->sym_p, sym_ind, address);
+    }
+    else if(sym_tab->get_symbol_type(sym_ind) == real_type) {
+        address = sym_tab->gen_temp_var(real_type);
+        q += new quadruple(q_rrindex, id->sym_p, sym_ind, address);
+    }
+
+    return address;
 }
 
 sym_index ast_statement_list::generate_quads(quad_list &q) {
-    // TODO: Implement
+    if(preceding != NULL) {
+        preceding->generate_quads(q);
+    }
+
+    if(last_stmt != NULL) {
+        last_stmt->generate_quads(q);
+    }
+    return NULL_SYM;
 }
 
 sym_index ast_procedure_head::generate_quads(quad_list &q) {
-    // TODO: Implement
+    USE_Q;
+    return NULL_SYM;
 }
 
 sym_index ast_function_head::generate_quads(quad_list &q) {
-    // TODO: Implement
+    USE_Q;
+    return NULL_SYM;
 }
 
 quad_list *ast_procedure_head::do_quads(ast_statement_list *s) {
-    // TODO: Implement
+    int last_label = sym_tab->get_next_label();
+    quad_list *q = new quad_list(last_label);
+
+    if(s != NULL) {
+        s->generate_quads(*q);
+    }
+
+    (*q) += new quadruple(q_label, last_label, NULL_SYM, NULL_SYM);
+    return q;
 }
 
 quad_list *ast_function_head::do_quads(ast_statement_list *s) {
-    // TODO: Implement
+    int last_label = sym_tab->get_next_label();
+    quad_list *q = new quad_list(last_label);
+
+    if(s != NULL) {
+        s->generate_quads(*q);
+    }
+
+    (*q) += new quadruple(q_label, last_label, NULL_SYM, NULL_SYM);
+    return q;
 }
 
 /* printing methods */
 
 void quadruple::print(ostream &o) {
-    // TODO: Implement
+    o << "    ";
+    o.flags(ios::left);
+    
+    switch (op_code) {
+        case q_rload:
+            o << setw(11) << "q_rload"
+            << setw(11) << int1
+            << setw(11) << "-"
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_iload:
+            o << setw(11) << "q_iload"
+            << setw(11) << int1
+            << setw(11) << "-"
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rplus:
+            o << setw(11) << "q_rplus"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_iplus:
+            o << setw(11) << "q_iplus"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rminus:
+            o << setw(11) << "q_rminus"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_iminus:
+            o << setw(11) << "q_iminus"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rmult:
+            o << setw(11) << "q_rmult"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_imult:
+            o << setw(11) << "q_imult"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rdiv:
+            o << setw(11) << "q_rdiv"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_idiv:
+            o << setw(11) << "q_idiv"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_req:
+            o << setw(11) << "q_req"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_ieq:
+            o << setw(11) << "q_ieq"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rlt:
+            o << setw(11) << "q_rlt"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_ilt:
+            o << setw(11) << "q_ilt"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rgt:
+            o << setw(11) << "q_rgt"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_igt:
+            o << setw(11) << "q_igt"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rstore:
+            o << setw(11) << "q_rstore"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << "-"
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_istore:
+            o << setw(11) << "q_istore"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << "-"
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_call:
+            o << setw(11) << "q_call"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << int2
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rreturn:
+            o << setw(11) << "q_rreturn"
+            << setw(11) << int1
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << "-";
+            break;
+        case q_ireturn:
+            o << setw(11) << "q_ireturn"
+            << setw(11) << int1
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << "-";
+            break;
+        case q_lindex:
+            o << setw(11) << "q_lindex"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_rrindex:
+            o << setw(11) << "q_rrindex"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_irindex:
+            o << setw(11) << "q_irindex"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << sym_tab->get_symbol(sym3);
+            break;
+        case q_jmp:
+            o << setw(11) << "q_jmp"
+            << setw(11) << int1
+            << setw(11) << "-"
+            << setw(11) << "-";
+            break;
+        case q_jmpf:
+            o << setw(11) << "q_jmpf"
+            << setw(11) << int1
+            << setw(11) << sym_tab->get_symbol(sym2)
+            << setw(11) << "-";
+            break;
+        case q_param:
+            o << setw(11) << "q_param"
+            << setw(11) << sym_tab->get_symbol(sym1)
+            << setw(11) << "-"
+            << setw(11) << "-";
+            break;
+        case q_label:
+            o << setw(11) << "q_label"
+            << setw(11) << int1
+            << setw(11) << "-"
+            << setw(11) << "-";
+            break;
+        case q_nop:
+            o << setw(11) << "q_nop"
+            << setw(11) << "-"
+            << setw(11) << "-"
+            << setw(11) << "-";
+            break;
+        default:
+            o << "unknown (" << (int)op_code << ")";
+    }
+
+    o.flags(ios::right);
 }
 
 void quad_list::print(ostream &o) {
-    // TODO: Implement
+    quad_list_element *e;
+    o << short_symbols;
+
+    quad_nr = 1;
+    e = head;
+
+    while(e != NULL) {
+        o << setw(5) << quad_nr << e->data << endl;
+        e = e->next;
+        quad_nr++;
+    }
+
+    o << long_symbols;
 }
 
 ostream &operator<<(ostream &o, quadruple *q) {
@@ -216,7 +562,7 @@ ostream &operator<<(ostream &o, quadruple *q) {
     return o;
 }
 
-ostream &operator<<(ostream &o, quad_list *q) {
+ostream &operator<<(ostream &o, quad_list *q_list) {
     if(q_list != NULL) {
         q_list->print(o);
     }
