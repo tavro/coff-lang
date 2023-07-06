@@ -7,7 +7,7 @@ class ast_optimizer;
 
 extern ast_optimizer *optimizer; // defined in optimize.cc
 
-// TODO: Write documentation for whole file
+// NOTE: Write documentation for whole file
 class ast_optimizer {
 public:
     void do_optimize(ast_statement_list *body);

@@ -1,0 +1,8 @@
+		push	rbp
+		mov	rcx, rsp
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 24
+L4:
+		leave	
+		ret	

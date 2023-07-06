@@ -25,7 +25,7 @@ public:
     sym_index check_binop1(ast_binary_operation *);
     sym_index check_binop2(ast_binary_operation *, string);
 
-    // TODO: Implement binary reation
+    sym_index check_binrel(ast_binary_relation *);
 };
 
 #endif

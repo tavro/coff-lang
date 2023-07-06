@@ -13,7 +13,7 @@ enum register_type { RAX, RCX, RDX };
 const int MAX_PARAMS = 127;
 const int STACK_WIDTH = 8;
 
-// TODO: Write documentation for this class
+// NOTE: Write documentation for this class
 class code_generator {
 private:
     string reg[3];

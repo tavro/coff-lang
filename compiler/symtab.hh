@@ -181,7 +181,7 @@ public:
     }
 };
 
-//TODO: Write description
+// NOTE: Write description
 class array_symbol : public symbol {
 protected:
     virtual void print(ostream &);
@@ -196,7 +196,7 @@ public:
     }
 };
 
-//TODO: Write documentation
+// NOTE: Write documentation
 class procedure_symbol : public symbol {
 protected:
     virtual void print(ostream &);
@@ -226,7 +226,7 @@ public:
 };
 
 /*
-TODO: write semantic check description
+NOTE: write semantic check description
 */
 class parameter_symbol : public symbol {
 protected:
@@ -346,10 +346,10 @@ public:
     /* symbol methods */
     symbol *get_symbol(const sym_index);
 
-    // TODO: write description for this
+    // NOTE: write description for this
     sym_index install_symbol(const pool_index, const sym_type tag);
 
-    // TODO: write description for this
+    // NOTE: write description for this
     sym_index lookup_symbol(const pool_index);
 
     /*
@@ -384,11 +384,11 @@ public:
 
     long get_next_label();
 
-    // TODO: write description for this
+    // NOTE: write description for this
     sym_index gen_temp_var(sym_index);
 
     /* functions for entering ids depending on context */
-    // TODO: write descriptions for these
+    // NOTE: write descriptions for these
     sym_index enter_constant (position_information *,
                               const pool_index,
                               const sym_index,
@@ -435,7 +435,7 @@ public:
     */
     sym_index current_environment();
 
-    // TODO: write descriptions for these
+    // NOTE: write descriptions for these
     void open_scope();
     sym_index close_scope();
 };

@@ -2,7 +2,7 @@
 
 #include "error.hh"
 
-//TODO: write more detailed documentation for this file
+// NOTE: write more detailed documentation for this file
 int error_count = 0;
 
 ostream &error(string header) {

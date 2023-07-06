@@ -104,7 +104,10 @@ sym_index ast_binary_operation::type_check() {
     return void_type;
 }
 
-// TODO: Implement binary relation
+sym_index ast_binary_relation::type_check() {
+    fatal("Trying to type check abstract class ast_binary_relation");
+    return void_type;
+}
 
 sym_index ast_statement_list::type_check() {
     if(preceding != NULL) {
@@ -136,7 +139,7 @@ sym_index ast_elseif_list::type_check() {
     return void_type;
 }
 
-// TODO: Write description
+// NOTE: Write description
 sym_index ast_id::type_check() {
     if(sym_tab->get_symbol(sym_p)->tag != SYM_TYPE) {
         return type;
@@ -159,7 +162,7 @@ sym_index ast_indexed::type_check() {
     return arr->type;
 }
 
-// TODO: Write description
+// NOTE: Write description
 sym_index semantic::check_binop1(ast_binary_operation *binop) {
     // TODO: This is ugly, needs to be rewritten
     sym_index left = binop->left->type_check();
@@ -204,7 +207,7 @@ sym_index ast_mult::type_check() {
     return type;
 }
 
-// TODO: Write description
+// NOTE: Write description
 sym_index ast_div::type_check() {
     sym_index left_type = left->type_check();
     sym_index right_type = right->type_check();
@@ -229,7 +232,7 @@ sym_index ast_div::type_check() {
     return type;
 }
 
-// TODO: Wrtie description
+// NOTE: Wrtie description
 sym_index semantic::check_binop2(ast_binary_operation* node, string s) {
     if(node->left->type_check() != int_type || node->right->type_check() != int_type) {
         type_error(node->pos) << s << endl;
@@ -242,22 +245,36 @@ sym_index semantic::check_binop2(ast_binary_operation* node, string s) {
 // TODO: Implement and
 // TODO: Implement alt div
 // TODO: Implement mod
-// TODO: Implement binary relation
+
+sym_index semantic::check_binrel(ast_binary_relation *node) {
+    sym_index left_type = node->left->type_check();
+    sym_index right_type = node->right->type_check();
+   
+    if (left_type != right_type) {
+        if (left_type != real_type) {
+            node->left = new ast_cast(node->left->pos, node->left);
+        }
+
+        if (right_type != real_type) {
+            node->right = new ast_cast(node->right->pos, node->right);
+        }
+    }
+
+    return int_type;
+}
+
 // TODO: Implement not equal
 
 sym_index ast_equal::type_check() {
-    // TODO: Implement binary relation
-    return void_type;
+    return type_checker->check_binrel(this);
 }
 
 sym_index ast_less_than::type_check() {
-    // TODO: Implement binary relation
-    return void_type;
+    return type_checker->check_binrel(this);
 }
 
 sym_index ast_greater_than::type_check() {
-    // TODO: Implement binary relation
-    return void_type;
+    return type_checker->check_binrel(this);
 }
 
 sym_index ast_procedure_call::type_check() {
@@ -299,7 +316,7 @@ sym_index ast_if::type_check() {
     return void_type;
 }
 
-// TODO: Write description
+// NOTE: Write description
 sym_index ast_return::type_check() {
     has_return = true;
 

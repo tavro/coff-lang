@@ -5,7 +5,7 @@ symbol::symbol(pool_index pool_p) {
     tag = SYM_UNDEF;
 }
 
-// TODO: Write description
+// NOTE: Write description
 constant_symbol::constant_symbol(const pool_index pool_p) : symbol(pool_p) {
     const_value.ival = 0;
 }
@@ -28,7 +28,7 @@ type_symbol::type_symbol(const pool_index pool_p) : symbol(pool_p) {
 }
 
 array_symbol::array_symbol(const pool_index pool_p) : symbol(pool_p) {
-    // TODO: change this
+    // NOTE: change this
     index_type = void_type;
     array_cardinality = 0;
 }

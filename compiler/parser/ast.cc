@@ -20,7 +20,9 @@ ast_expression::ast_expression(position_information *p, sym_index s) : ast_node(
     tag = AST_EXPRESSION;
 }
 
-// TODO: binary relation
+ast_binary_relation::ast_binary_relation(position_information *p, ast_expression *l, ast_expression *r) : ast_expression(p, int_type), left(l), right(r) {
+    tag = AST_BINARY_RELATION;
+}
 
 ast_binary_operation::ast_binary_operation(position_information *p, ast_expression *l, ast_expression *r) : ast_expression(p), left(l), right(r) {
     tag = AST_BINARY_OP;
@@ -95,12 +97,19 @@ ast_function_call::ast_function_call(position_information *p, ast_id *i, ast_exp
 // TODO: uminus if neeccesary
 // TODO: not if neccesary
 
-// TODO: equal after implementing binary relation
+ast_equal::ast_equal(position_information *p, ast_expression *l, ast_expression *r) : ast_binary_relation(p, l, r) {
+    tag = AST_BINARY_RELATION;
+}
 
 // TODO: not equal if neccesary
 
-// TODO: less than after implementing binary relation
-// TODO: greater than after implementing binary relation
+ast_less_than::ast_less_than(position_information *p, ast_expression *l, ast_expression *r) : ast_binary_relation(p, l, r) {
+    tag = AST_LESS_THAN;
+}
+
+ast_greater_than::ast_greater_than(position_information *p, ast_expression *l, ast_expression *r) : ast_binary_relation(p, l, r) {
+    tag = AST_GREATER_THAN;
+}
 
 ast_add::ast_add(position_information *p, ast_expression *l, ast_expression *r) : ast_binary_operation(p, l, r) {
     tag = AST_ADD;
@@ -211,7 +220,20 @@ void ast_expression::print(ostream& o) {
     o << "Expression [" << short_symbols << sym_tab->get_symbol(type) << long_symbols << "]\n";
 }
 
-// TODO: implement binary relation
+void ast_binary_relation::print(ostream& o) {
+    o << "Binary Relation";
+}
+
+void ast_binary_relation::xprint(ostream &o, string s) {
+    o << s << " (left, right) [" << short_symbols << sym_tab->get_symbol(type) << long_symbols << "]\n";
+
+    begin_child(o);
+    o << left << endl;
+    end_child(o);
+    last_child(o);
+    o << right;
+    end_child(o);
+}
 
 void ast_binary_operation::print(ostream &o) {
     o << "Binary Operation";

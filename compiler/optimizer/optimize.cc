@@ -41,7 +41,9 @@ void ast_binary_operation::optimize() {
     fatal("Trying to optimize abstract class ast_binary_operation");
 }
 
-// TODO: Binary relation
+void ast_binary_relation::optimize() {
+    fatal("Trying to optimize abstract class ast_binary_relation");
+}
 
 void ast_statement_list::optimize() {
     if(preceding != NULL) {
@@ -219,8 +221,6 @@ void ast_div::optimize() {
 // TODO: OR, AND, NOT, MOD, etc...
 
 void ast_equal::optimize() {
-    /*
-    TODO:
     if(left) {
         left->optimize();
         left = optimizer->fold_constants(left);
@@ -230,12 +230,9 @@ void ast_equal::optimize() {
         right->optimize();
         right = optimizer->fold_constants(right);
     }
-    */
 }
 
 void ast_less_than::optimize() {
-    /*
-    TODO:
     if(left) {
         left->optimize();
         left = optimizer->fold_constants(left);
@@ -245,12 +242,9 @@ void ast_less_than::optimize() {
         right->optimize();
         right = optimizer->fold_constants(right);
     }
-    */
 }
 
 void ast_greater_than::optimize() {
-    /*
-    TODO:
     if(left) {
         left->optimize();
         left = optimizer->fold_constants(left);
@@ -260,7 +254,6 @@ void ast_greater_than::optimize() {
         right->optimize();
         right = optimizer->fold_constants(right);
     }
-    */
 }
 
 void ast_procedure_call::optimize() {

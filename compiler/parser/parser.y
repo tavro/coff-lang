@@ -45,7 +45,7 @@ extern bool assembler;
     pool_index          pool_p;
 }
 
-// TODO: Desc may be a good idea
+// NOTE: Desc may be a good idea
 %type <id>              id const_id rvar_id array_id proc_id func_id type_id // TODO: lvar_id
 %type <statement_list>  stmt_list comp_stmt else_part
 %type <statement>       stmt

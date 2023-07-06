@@ -63,38 +63,83 @@ quad_list &quad_list::operator+=(quadruple *q) {
 /* methods for generating quads */
 
 sym_index ast_expression_list::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    USE_Q;
+
+    fatal("trying to call generate_quads on ast_expression_list");
+
+    return NULL_SYM;   
 }
 
 sym_index ast_elseif_list::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    USE_Q;
+
+    fatal("trying to call generate_quads on ast_elseif_list");
+
+    return NULL_SYM;
 }
 
 sym_index ast_elseif::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    USE_Q;
+
+    int bottom = sym_tab->get_next_label();
+    sym_index pos = condition->generate_quads(q);
+
+    q += new quadruple(q_jmpf, bottom, pos, NULL_SYM);
+    pos = body->generate_quads(q);
+    q += new quadruple(q_label, bottom, NULL_SYM, NULL_SYM);
+
+    return NULL_SYM;
 }
 
 sym_index ast_id::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    USE_Q;
+    return sym_p;  
 }
 
 sym_index ast_int::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    USE_Q;
+    sym_index address = sym_tab->gen_temp_var(int_type);
+    q += new quadruple(q_iload, value, NULL_SYM, address);
+    return address;
 }
 
 sym_index ast_real::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    USE_Q;
+    sym_index address = sym_tab->gen_temp_var(real_type);
+    q += new quadruple(q_rload, sym_tab->ieee(value), NULL_SYM, address);
+    return address;
 }
 
 // TODO: Implement NOT
 // TODO: Implement uminus
 
 sym_index ast_cast::generate_quads(quad_list &q) {
-    // TODO: Implement   
+    USE_Q;
+
+    sym_index sym_expr = expr->generate_quads(q);
+    sym_index address = sym_tab->gen_temp_var(real_type);
+
+    q += new quadruple(q_itor, sym_expr, NULL_SYM, address);
+
+    return address; 
 }
 
 sym_index do_binary_operation(quad_list &q, quad_op_type iop, quad_op_type rop, ast_binary_operation *node) {
-    // TODO: Implement   
+    sym_index sym_left = node->left->generate_quads(q);
+    sym_index sym_right = node->right->generate_quads(q);
+
+    sym_index address;
+
+    if(sym_tab->get_symbol_type(sym_left) == int_type) {
+        address = sym_tab->gen_temp_var(int_type);
+        q += new quadruple(iop, sym_left, sym_right, address);
+    }
+    else {
+        address = sym_tab->gen_temp_var(real_type);
+        q += new quadruple(rop, sym_left, sym_right, address);
+    }
+
+    return address;
 }
 
 sym_index ast_add::generate_quads(quad_list &q) {
@@ -122,20 +167,36 @@ sym_index ast_div::generate_quads(quad_list &q) {
 // TODO: or
 // TODO: and
 
-// TODO: binary relation
+sym_index do_binary_relation(quad_list &q, quad_op_type iop, quad_op_type rop, ast_binary_relation *node) {
+    sym_index sym_left = node->left->generate_quads(q);
+    sym_index sym_right = node->right->generate_quads(q);
+    sym_index tmp_var = sym_tab->gen_temp_var(int_type);
+
+    if(sym_tab->get_symbol_type(sym_left) == int_type) {
+        q += new quadruple(iop, sym_left, sym_right, tmp_var);
+    }
+    else {
+        q += new quadruple(rop, sym_left, sym_right, tmp_var);
+    }
+
+    return tmp_var;
+}
 
 sym_index ast_equal::generate_quads(quad_list &q) {
-    // TODO: Implement binary relation  
+    USE_Q;
+    return do_binary_relation(q, q_ieq, q_req, this);
 }
 
 // TODO: not equal
 
 sym_index ast_less_than::generate_quads(quad_list &q) {
-    // TODO: Implement binary relation
+    USE_Q;
+    return do_binary_relation(q, q_ilt, q_rlt, this);
 }
 
 sym_index ast_greater_than::generate_quads(quad_list &q) {
-    // TODO: Implement binary relation  
+    USE_Q;
+    return do_binary_relation(q, q_igt, q_rgt, this);
 }
 
 // TODO: assignment

@@ -24,7 +24,7 @@ allocates data members.
 the table itself is just a table of pointers to symbols
 */
 symbol_table::symbol_table() {
-    // TODO: documentation needed
+    // NOTE: documentation needed
     pool_pos = 0;
     pool_length = BASE_POOL_SIZE;
 
@@ -68,7 +68,7 @@ symbol_table::symbol_table() {
     int_type = enter_type(dummy_pos, pool_install(capitalize("int")));
     real_type = enter_type(dummy_pos, pool_install(capitalize("real")));
 
-    // TODO: write documentation for below
+    // NOTE: write documentation for below
     {
         sym_index read_sym = enter_function(dummy_pos, pool_install(capitalize("read")));
         sym_table[read_sym]->type = int_type;
@@ -96,7 +96,7 @@ symbol_table::symbol_table() {
 
 /* utility functions */
 
-// TODO: Write desc
+// NOTE: Write desc
 long symbol_table::ieee(double d) {
     assert(sizeof(double) == 8);
     assert(sizeof(long) == 8);
@@ -110,7 +110,7 @@ long symbol_table::get_next_label() {
     return label_nr++; // labels start on -1
 }
 
-// TODO: Write desc
+// NOTE: Write desc
 sym_index symbol_table::gen_temp_var(sym_index type) {
     string name = "$" + to_string(++sym_tab->temp_nr);
 
@@ -150,7 +150,7 @@ int symbol_table::get_size(const sym_index type) {
     return -1;
 }
 
-// TODO: write description
+// NOTE: write description
 void symbol_table::print(int detail) {
     if(detail == 2) {
         if(pool_pos > 0) {
@@ -310,7 +310,7 @@ char *symbol_table::capitalize(const char *s) {
     return capitalized_s;
 }
 
-// TODO: write description
+// NOTE: write description
 pool_index symbol_table::pool_install(char *s) {
     // check if pool is full, if so, double its size
     if(pool_pos + 1 + (int) strlen(s) >= pool_length) {
@@ -371,7 +371,7 @@ pool_index symbol_table::pool_forget(const pool_index pool_p) {
     return pool_pos;
 }
 
-// TODO: Write desc
+// NOTE: Write desc
 char *symbol_table::fix_string(const char *old_str) {
     assert(strlen(old_str) >= 2);
 
@@ -450,7 +450,7 @@ sym_index symbol_table::close_scope() {
 
 /* main methods */
 
-// TODO: write description
+// NOTE: write description
 sym_index symbol_table::lookup_symbol(const pool_index pool_p) {
     hash_index h_index = hash(pool_p);
     sym_index s_index = hash_table[h_index];
@@ -473,7 +473,7 @@ symbol *symbol_table::get_symbol(const sym_index sym_p) {
     return sym_table[sym_p];
 }
 
-//TODO: write description
+// NOTE: write description
 pool_index symbol_table::get_symbol_id(const sym_index sym_p) {
     // this should never happen
     // 0 points to name of global level => 'program.'
@@ -484,7 +484,7 @@ pool_index symbol_table::get_symbol_id(const sym_index sym_p) {
     return sym_table[sym_p]->id;
 }
 
-//TODO: write description
+// NOTE: write description
 sym_index symbol_table::get_symbol_type(const sym_index sym_p) {
     if(sym_p == NULL_SYM) {
         return void_type;
@@ -493,7 +493,7 @@ sym_index symbol_table::get_symbol_type(const sym_index sym_p) {
     return sym_table[sym_p]->type;
 }
 
-//TODO: write description
+// NOTE: write description
 sym_type symbol_table::get_symbol_tag(const sym_index sym_p) {
     if(sym_p == NULL_SYM) {
         return SYM_UNDEF;
@@ -502,7 +502,7 @@ sym_type symbol_table::get_symbol_tag(const sym_index sym_p) {
     return sym_table[sym_p]->tag;
 }
 
-//TODO: write description
+// NOTE: write description
 void symbol_table::set_symbol_type(const sym_index sym_p, const sym_index type_p) {
     if(sym_p == NULL_SYM) {
         return;
@@ -511,7 +511,7 @@ void symbol_table::set_symbol_type(const sym_index sym_p, const sym_index type_p
     sym_table[sym_p]->type = type_p;
 }
 
-//TODO: write description
+// NOTE: write description
 sym_index symbol_table::install_symbol(const pool_index pool_p, const sym_type tag) {
     sym_index index = this->lookup_symbol(pool_p);
     symbol *sym;
@@ -563,7 +563,7 @@ sym_index symbol_table::install_symbol(const pool_index pool_p, const sym_type t
     return index;
 }
 
-//TODO: write description
+// NOTE: write description
 sym_index symbol_table::enter_constant(position_information *pos, const pool_index pool_p, const sym_index type, const long ival) {
     // install constant in sym table
     sym_index sym_p = install_symbol(pool_p, SYM_CONST);
@@ -583,7 +583,7 @@ sym_index symbol_table::enter_constant(position_information *pos, const pool_ind
     return sym_p;
 }
 
-//TODO: write description
+// NOTE: write description
 sym_index symbol_table::enter_constant(position_information *pos, const pool_index pool_p, const sym_index type, const double rval) {
     sym_index sym_p = install_symbol(pool_p, SYM_CONST);
     constant_symbol *con = sym_table[sym_p]->get_constant_symbol();
@@ -601,7 +601,7 @@ sym_index symbol_table::enter_constant(position_information *pos, const pool_ind
     return sym_p;
 }
 
-//TODO: Write documentation
+// NOTE: Write documentation
 sym_index symbol_table::enter_variable(position_information *pos, const pool_index pool_p, const sym_index type) {
     sym_index sym_p = install_symbol(pool_p, SYM_VAR);
     symbol *tmp = sym_table[sym_p];
@@ -644,9 +644,8 @@ sym_index symbol_table::enter_variable(pool_index pool_p, sym_index type) {
     return enter_variable(NULL, pool_p, type);
 }
 
-// TODO: Write description
+// NOTE: Write description
 sym_index symbol_table::enter_array(position_information *pos, const pool_index pool_p, const sym_index type, const int cardinality) {
-    // TODO: Implement enter_array
     sym_index sym_p = install_symbol(pool_p, SYM_ARRAY);
     array_symbol *arr = sym_table[sym_p]->get_array_symbol();
 
@@ -741,7 +740,7 @@ sym_index symbol_table::enter_parameter(position_information *pos, const pool_in
         return sym_p;
     }
 
-    // TODO: explain why we do this
+    // NOTE: explain why we do this
     symbol *tmp = sym_table[current_environment()];
 
     parameter_symbol *tmp_param;
