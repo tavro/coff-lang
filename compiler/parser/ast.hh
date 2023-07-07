@@ -34,7 +34,14 @@ enum ast_node_types {
     AST_FUNCTION_HEAD,
     AST_PROCEDURE_HEAD,
     AST_PARAM,
-    AST_CAST
+    AST_CAST,
+    AST_NOT,
+    AST_AND,
+    AST_MOD,
+    AST_OR,
+    AST_DO,
+    AST_ASSIGN,
+    AST_NOT_EQUAL
 };
 typedef enum ast_node_types ast_node_type;
 
@@ -171,7 +178,7 @@ public:
     virtual sym_index type_check();
     virtual void optimize();
     virtual sym_index generate_quads(quad_list &) = 0;
-    // TODO: Code generation
+    virtual void generate_assignment(quad_list &, sym_index) = 0;
 };
 
 class ast_elseif : public ast_node {
@@ -345,7 +352,20 @@ public:
 };
 
 // TODO: Implement uminus if necessary
-// TODO: Implement not if necessary
+class ast_not : public ast_expression {
+protected:
+    virtual void print(ostream &);
+
+public:
+    ast_expression *expr;
+
+    ast_not(position_information *, ast_expression *);
+
+    virtual sym_index type_check();
+    virtual void optimize();
+    virtual sym_index generate_quads(quad_list &);
+};
+
 
 class ast_int : public ast_expression {
 protected:
@@ -410,7 +430,17 @@ public:
     virtual sym_index generate_quads(quad_list &);
 };
 
-// TODO: not equal if necessary
+class ast_not_equal : public ast_binary_relation {
+protected:
+    virtual void print(ostream &);
+
+public:
+    ast_not_equal(position_information *, ast_expression *, ast_expression *);
+
+    virtual sym_index type_check();
+    virtual void optimize();
+    virtual sym_index generate_quads(quad_list &);
+};
 
 class ast_less_than : public ast_binary_relation {
 protected:
@@ -452,6 +482,21 @@ public:
     }
 };
 
+class ast_assign : public ast_statement {
+protected:
+    virtual void print(ostream &);
+
+public:
+    ast_lval *lhs;
+    ast_expression *rhs;
+
+    ast_assign(position_information *, ast_lval *, ast_expression *);
+
+    virtual sym_index type_check();
+    virtual void optimize();
+    virtual sym_index generate_quads(quad_list &);
+};
+
 class ast_sub : public ast_binary_operation {
 protected:
     virtual void print(ostream &);
@@ -468,8 +513,36 @@ public:
     }
 };
 
-// TODO: Implement or if necessary
-// TODO: Implement and if necessary
+class ast_or : public ast_binary_operation {
+protected:
+    virtual void print(ostream &);
+
+public:
+    ast_or(position_information *, ast_expression *, ast_expression *);
+
+    virtual sym_index type_check();
+    virtual void optimize();
+    virtual sym_index generate_quads(quad_list &);
+    
+    virtual ast_or *get_ast_binary_operation() {
+        return this;
+    }
+};
+
+class ast_and : public ast_binary_operation{
+protected:
+    virtual void print(ostream &);
+public:
+    ast_and(position_information *, ast_expression *, ast_expression *);
+
+    virtual sym_index type_check();
+    virtual void optimize();
+    virtual sym_index generate_quads(quad_list &);
+    
+    virtual ast_and *get_ast_binary_operation() {
+        return this;
+    }
+};
 
 class ast_mult : public ast_binary_operation {
 protected:
@@ -504,7 +577,21 @@ public:
 };
 
 // TODO: idiv if necessary
-// TODO: mod if necessary
+class ast_mod : public ast_binary_operation {
+protected:
+    virtual void print(ostream &);
+
+public:
+    ast_mod(position_information *, ast_expression *, ast_expression *);
+
+    virtual sym_index type_check();
+    virtual void optimize();
+    virtual sym_index generate_quads(quad_list &);
+
+    virtual ast_mod *get_ast_binary_operation() {
+        return this;
+    }
+};
 
 class ast_id : public ast_lval {
 protected:
@@ -519,7 +606,7 @@ public:
     virtual sym_index type_check();
     virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
-    // TODO: code generation
+    virtual void generate_assignment(quad_list &, sym_index);
 
     virtual ast_id *get_ast_id() {
         return this;
@@ -539,7 +626,7 @@ public:
     virtual sym_index type_check();
     virtual void optimize();
     virtual sym_index generate_quads(quad_list &);
-    // TODO: code generation
+    virtual void generate_assignment(quad_list &, sym_index);
 };
 
 ostream &operator<<(ostream &, ast_node *);

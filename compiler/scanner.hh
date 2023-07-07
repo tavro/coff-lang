@@ -53,6 +53,12 @@ typedef struct {
 #define T_PROCEDURE     288 // procedure
 #define T_ARRAY         289 // array
 
+#define T_NOT           290 // not
+#define T_AND           291 // and
+#define T_MOD           292 // mod
+#define T_OR            292 // or
+#define T_DO            293 // do
+
 #define NR_SYMBOLS      99
 
 extern YYSTYPE yylval; // additional info for certain tokens

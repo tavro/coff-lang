@@ -11,12 +11,13 @@ comments show argument types
 typedef enum {
     q_rload,        // int, -, sym
     q_iload,        // int, -, sym
-    /* TODO: not */
+    q_inot,         // sym, -, sym
     /* TODO: uminus */
-    /* TODO: or */
-    /* TODO: and */
-    /* TODO: mod */
-    /* TODO: not equal */
+    q_ior,          // sym, sym, sym
+    q_iand,         // sym, sym, sym
+    q_imod,         // sym, sym, sym
+    q_rne,          // sym, sym, sym
+    q_ine,          // sym, sym, sym
     q_rplus,        // sym, sym, sym
     q_iplus,        // sym, sym, sym
     q_rminus,       // sym, sym, sym
@@ -33,7 +34,8 @@ typedef enum {
     q_igt,          // sym, sym, sym
     q_rstore,       // sym, -, sym
     q_istore,       // sym, -, sym
-    /* TODO: assign */
+    q_rassign,      // sym, -, sym
+    q_iassign,      // sym, -, sym
     q_call,         // sym, int, sym (- for procedure)
     q_rreturn,      // int, sym, -
     q_ireturn,      // int, sym, -

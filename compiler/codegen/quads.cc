@@ -110,7 +110,17 @@ sym_index ast_real::generate_quads(quad_list &q) {
     return address;
 }
 
-// TODO: Implement NOT
+sym_index ast_not::generate_quads(quad_list &q) {
+    USE_Q;
+
+    sym_index sym_expr = expr->generate_quads(q);
+    sym_index address = sym_tab->gen_temp_var(int_type);
+
+    q += new quadruple(q_inot, sym_expr, NULL_SYM, address);
+
+    return address;
+}
+
 // TODO: Implement uminus
 
 sym_index ast_cast::generate_quads(quad_list &q) {
@@ -163,9 +173,21 @@ sym_index ast_div::generate_quads(quad_list &q) {
 }
 
 // TODO: idiv
-// TODO: mod
-// TODO: or
-// TODO: and
+sym_index ast_mod::generate_quads(quad_list &q) {
+    USE_Q;
+    return do_binary_operation(q, q_imod, q_nop, this);
+}
+
+sym_index ast_or::generate_quads(quad_list &q) {
+    USE_Q;
+    return do_binary_operation(q, q_ior, q_nop, this);
+}
+
+sym_index ast_and::generate_quads(quad_list &q) {
+    USE_Q;
+    return do_binary_operation(q, q_iand, q_nop, this);
+}
+
 
 sym_index do_binary_relation(quad_list &q, quad_op_type iop, quad_op_type rop, ast_binary_relation *node) {
     sym_index sym_left = node->left->generate_quads(q);
@@ -187,7 +209,10 @@ sym_index ast_equal::generate_quads(quad_list &q) {
     return do_binary_relation(q, q_ieq, q_req, this);
 }
 
-// TODO: not equal
+sym_index ast_not_equal::generate_quads(quad_list &q) {
+    USE_Q;
+    return do_binary_relation(q, q_ine, q_rne, this);
+}
 
 sym_index ast_less_than::generate_quads(quad_list &q) {
     USE_Q;
@@ -199,7 +224,42 @@ sym_index ast_greater_than::generate_quads(quad_list &q) {
     return do_binary_relation(q, q_igt, q_rgt, this);
 }
 
-// TODO: assignment
+void ast_id::generate_assignment(quad_list &q, sym_index rhs) {
+    if (type == int_type) {
+        q += new quadruple(q_iassign, rhs, NULL_SYM, sym_p);
+    } 
+    else if (type == real_type) {
+        q += new quadruple(q_rassign, rhs, NULL_SYM, sym_p);
+    } 
+    else {
+        fatal("Illegal type in ast_id::generate_assignment()");
+    }
+}
+
+
+void ast_indexed::generate_assignment(quad_list &q, sym_index rhs) {
+    sym_index index_pos = index->generate_quads(q);
+    sym_index address = sym_tab->gen_temp_var(int_type);
+
+    q += new quadruple(q_lindex, id->sym_p, index_pos, address);
+
+    if (id->type == int_type) {
+        q += new quadruple(q_istore, rhs, NULL_SYM, address);
+    } 
+    else if (id->type == real_type) {
+        q += new quadruple(q_rstore, rhs, NULL_SYM, address);
+    } 
+    else {
+        fatal("Illegal type in ast_indexed::generate_assignment()");
+    }
+}
+
+
+sym_index ast_assign::generate_quads(quad_list &q) {
+    sym_index right_pos = rhs->generate_quads(q);
+    lhs->generate_assignment(q, right_pos);
+    return NULL_SYM;
+}
 
 void ast_expression_list::generate_param_list(quad_list &q, parameter_symbol *last_param, int *nr_params) {
     USE_Q;

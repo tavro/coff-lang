@@ -263,7 +263,20 @@ void code_generator::expand(quad_list *q_list) {
                 STREAM << "\t\t" << "mov" << "\t" << "rax, " << q->int1 << endl;
                 store(RAX, q->sym3);
                 break;
-            // TODO: not
+            case q_inot: {
+                int label = sym_tab->get_next_label();
+                int label2 = sym_tab->get_next_label();
+                fetch(q->sym1, RAX);
+                STREAM << "\t\t" << "cmp" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "je" << "\t" << "L" << label << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "jmp" << "\t" << "L" << label2 << endl;
+                STREAM << "\t\t" << "L" << label << ":" << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 1" << endl;
+                STREAM<< "\t\t" << "L" << label2 << ":" <<  endl;
+                store(RAX, q->sym3);
+                break;
+            }
             // TODO: uminus
             case q_rplus:
                 fetch_float(q->sym1);
@@ -289,8 +302,40 @@ void code_generator::expand(quad_list *q_list) {
                 STREAM << "\t\t" << "sub" << "\t" << "rax, rcx" << endl;
                 store(RAX, q->sym3);
                 break;
-            // TODO: or
-            // TODO: and
+            case q_ior: {
+                int label = sym_tab->get_next_label();
+                int label2 = sym_tab->get_next_label();
+                fetch(q->sym1, RAX);
+                STREAM << "\t\t" << "cmp" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "jne" << "\t" << "L" << label << endl;
+                fetch(q->sym2, RAX);
+                STREAM << "\t\t" << "cmp" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "jne" << "\t" << "L" << label << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "jmp" << "\t" << "L" << label2 << endl;
+                STREAM << "\t\t" << "L" << label << ":" << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 1" << endl;
+                STREAM << "\t\t" << "L" << label2 << ":" << endl;
+                store(RAX, q->sym3);
+                break;
+            }
+            case q_iand: {
+                int label = sym_tab->get_next_label();
+                int label2 = sym_tab->get_next_label();
+                fetch(q->sym1, RAX);
+                STREAM << "\t\t" << "cmp" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "je" << "\t" << "L" << label << endl;
+                fetch(q->sym2, RAX);
+                STREAM << "\t\t" << "cmp" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "je" << "\t" << "L" << label << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 1" << endl;
+                STREAM << "\t\t" << "jmp" << "\t" << "L" << label2 << endl;
+                STREAM << "\t\t" << "L" << label << ":" << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "L" << label2 << ":" << endl;
+                store(RAX, q->sym3);
+                break;
+            }
             case q_rmult:
                 fetch_float(q->sym1);
                 fetch_float(q->sym2);
@@ -316,7 +361,13 @@ void code_generator::expand(quad_list *q_list) {
                 STREAM << "\t\t" << "idiv" << "\t" << "rax, rcx" << endl;
                 store(RAX, q->sym3);
                 break;
-            // TODO: mod
+            case q_imod:
+                fetch(q->sym1, RAX);
+                fetch(q->sym2, RCX);
+                STREAM << "\t\t" << "cqo" << endl;
+                STREAM << "\t\t" << "idiv" << "\t" << "rax, rcx" << endl;
+                store(RDX, q->sym3);
+                break;
             case q_req: {
                 int label = sym_tab->get_next_label();
                 int label2 = sym_tab->get_next_label();
@@ -348,7 +399,37 @@ void code_generator::expand(quad_list *q_list) {
                 store(RAX, q->sym3);
                 break;
             }
-            // TODO: not equal
+            case q_rne: {
+                int label = sym_tab->get_next_label();
+                int label2 = sym_tab->get_next_label();
+                fetch_float(q->sym1);
+                fetch_float(q->sym2);
+                STREAM << "\t\t" << "fcomip" << "\t" << "ST(0), ST(1)" << endl;
+                STREAM << "\t\t" << "fstp" << "\t" << "ST(0)" << endl;
+                STREAM << "\t\t" << "jne" << "\t" << "L" << label << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "jmp" << "\t" << "L" << label2 << endl;
+                STREAM << "\t\t" << "L" << label << ":" << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 1" << endl;
+                STREAM << "\t\t" << "L" << label2 << ":" << endl;
+                store(RAX, q->sym3);
+                break;
+            }
+            case q_ine: {
+                int label = sym_tab->get_next_label();
+                int label2 = sym_tab->get_next_label();
+                fetch(q->sym1, RAX);
+                fetch(q->sym2, RCX);
+                STREAM << "\t\t" << "cmp" << "\t" << "rax, rcx" << endl;
+                STREAM << "\t\t" << "jne" << "\t" << "L" << label << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 0" << endl;
+                STREAM << "\t\t" << "jmp" << "\t" << "L" << label2 << endl;
+                STREAM << "\t\t" << "L" << label << ":" << endl;
+                STREAM << "\t\t" << "mov" << "\t" << "rax, 1" << endl;
+                STREAM << "\t\t" << "L" << label2 << ":" << endl;
+                store(RAX, q->sym3);
+                break;
+            }
             case q_rlt: {
                 int label = sym_tab->get_next_label();
                 int label2 = sym_tab->get_next_label();
@@ -417,7 +498,11 @@ void code_generator::expand(quad_list *q_list) {
                 fetch(q->sym3, RCX);
                 STREAM << "\t\t" << "mov" << "\t" << "[rcx], rax" << endl;
                 break;
-            // TODO: assign
+            case q_rassign:
+            case q_iassign:
+                fetch(q->sym1, RAX);
+                store(RAX, q->sym3);
+                break;
             case q_param: {
                 fetch(q->sym1, RAX);
                 STREAM << "\t\t" << "push" << "\t" << "rax" << endl;
@@ -462,7 +547,22 @@ void code_generator::expand(quad_list *q_list) {
                 STREAM << "\t\t" << "mov" << "\t" << "rax, [rax]" << endl;
                 store(RAX, q->sym3);
                 break;
-            // TODO: itor
+            case q_itor: {
+                block_level level;
+                int offset;
+                find(q->sym1, &level, &offset);
+                frame_address(level, RCX);
+                STREAM << "\t\t" << "fild" << "\t" << "qword ptr [rcx";
+                
+                if (offset >= 0) {
+                    STREAM << "+" << offset;
+                } else {
+                    STREAM << offset;
+                }
+
+                STREAM << "]" << endl;
+                store_float(q->sym3);
+            }
             case q_jmp:
                 STREAM << "\t\t" << "jmp" << "\t" << "L" << q->int1 << endl;
                 break;

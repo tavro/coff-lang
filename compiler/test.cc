@@ -50,7 +50,13 @@ token_name tokens[] = {
     { T_STRING,         "T_STRING" },
     { T_VAR,            "T_VAR" },
     { T_PROCEDURE,      "T_PROCEDURE" },
-    { T_ARRAY,          "T_ARRAY" }
+    { T_ARRAY,          "T_ARRAY" },
+
+    { T_NOT,          "T_NOT" },
+    { T_AND,          "T_AND" },
+    { T_MOD,          "T_MOD" },
+    { T_OR,           "T_OR" },
+    { T_DO,           "T_DO" }
 };
 
 const int nr_tokens = sizeof(tokens) / sizeof(*tokens);

@@ -9,12 +9,14 @@ void ast_optimizer::do_optimize(ast_statement_list *body) {
 }
 
 bool ast_optimizer::is_binop(ast_expression *node) {
-    // TODO: OR, AND, MOD, etc...
     switch(node->tag) {
         case AST_ADD:
         case AST_SUB:
         case AST_MULT:
         case AST_DIV:
+        case AST_MOD:
+        case AST_AND:
+        case AST_OR:
             return true;
         default:
             return false;
@@ -129,8 +131,6 @@ ast_expression *ast_optimizer::fold_constants(ast_expression *node) {
             return node;
         }
 
-        // TODO: MULT, AND, OR, MOD, etc...
-
         if(lhs->type == int_type && rhs->type == int_type) {
             long lhs_val = get_id_int_val(lhs);
             long rhs_val = get_id_int_val(rhs);
@@ -144,6 +144,12 @@ ast_expression *ast_optimizer::fold_constants(ast_expression *node) {
                     return new ast_int(binop->pos, lhs_val * rhs_val);
                 case AST_DIV:
                     return new ast_int(binop->pos, lhs_val / rhs_val);
+                case AST_AND:
+                    return new ast_int(binop->pos, lhs_val && rhs_val);
+                case AST_OR:
+                    return new ast_int(binop->pos, lhs_val || rhs_val);
+                case AST_MOD:
+                    return new ast_int(binop->pos, lhs_val % rhs_val);
                 default:
                     return node;
             }
@@ -161,6 +167,12 @@ ast_expression *ast_optimizer::fold_constants(ast_expression *node) {
                     return new ast_real(binop->pos, lhs_val * rhs_val);
                 case AST_DIV:
                     return new ast_real(binop->pos, lhs_val / rhs_val);
+                case AST_AND:
+                    return new ast_real(binop->pos, lhs_val && rhs_val);
+                case AST_OR:
+                    return new ast_real(binop->pos, lhs_val || rhs_val);
+                case AST_MOD:
+                    return new ast_real(binop->pos, lhs_val % rhs_val);
                 default:
                     return node;
             }
@@ -218,7 +230,60 @@ void ast_div::optimize() {
     }
 }
 
-// TODO: OR, AND, NOT, MOD, etc...
+void ast_not::optimize() {
+    if(expr) {
+        expr->optimize();
+        expr = optimizer->fold_constants(expr);
+    }
+}
+
+void ast_or::optimize() {
+    if(left) {
+        left->optimize();
+        left = optimizer->fold_constants(left);
+    }
+    
+    if(right) {
+        right->optimize();
+        right = optimizer->fold_constants(right);
+    }
+}
+
+void ast_and::optimize() {
+    if(left) {
+        left->optimize();
+        left = optimizer->fold_constants(left);
+    }
+    
+    if(right) {
+        right->optimize();
+        right = optimizer->fold_constants(right);
+    }
+}
+
+void ast_mod::optimize() {
+    if(left) {
+        left->optimize();
+        left = optimizer->fold_constants(left);
+    }
+    
+    if(right) {
+        right->optimize();
+        right = optimizer->fold_constants(right);
+    }
+}
+
+void ast_not_equal::optimize() {
+    if(left) {
+        left->optimize();
+        left = optimizer->fold_constants(left);
+    }
+    
+    if(right) {
+        right->optimize();
+        right = optimizer->fold_constants(right);
+    }
+}
 
 void ast_equal::optimize() {
     if(left) {
@@ -262,7 +327,12 @@ void ast_procedure_call::optimize() {
     }
 }
 
-// TODO: assign, not eq
+void ast_assign::optimize() {
+    if(rhs) {
+        rhs->optimize();
+        rhs = optimizer->fold_constants(rhs);
+    }
+}
 
 void ast_while::optimize() {
     if(condition) {

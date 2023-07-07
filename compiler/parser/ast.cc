@@ -71,7 +71,12 @@ ast_procedure_call::ast_procedure_call(position_information *p, ast_id *i, ast_e
     tag = AST_PROCEDURE_CALL;
 }
 
-// TODO: assignment
+ast_assign::ast_assign(position_information *p, ast_lval *l, ast_expression *r) :
+    ast_statement(p),
+    lhs(l),
+    rhs(r) {
+    tag = AST_ASSIGN;
+}
 
 ast_while::ast_while(position_information *p, ast_expression *c, ast_statement_list *b) : ast_statement(p), condition(c), body(b) {
     tag = AST_WHILE;
@@ -95,13 +100,20 @@ ast_function_call::ast_function_call(position_information *p, ast_id *i, ast_exp
 }
 
 // TODO: uminus if neeccesary
-// TODO: not if neccesary
+ast_not::ast_not(position_information *p, ast_expression *e) :
+    ast_expression(p, int_type),
+    expr(e) {
+    tag = AST_NOT;
+}
 
 ast_equal::ast_equal(position_information *p, ast_expression *l, ast_expression *r) : ast_binary_relation(p, l, r) {
     tag = AST_BINARY_RELATION;
 }
 
-// TODO: not equal if neccesary
+ast_not_equal::ast_not_equal(position_information *p, ast_expression *l, ast_expression *r) :
+    ast_binary_relation(p, l, r) {
+    tag = AST_NOT_EQUAL;
+}
 
 ast_less_than::ast_less_than(position_information *p, ast_expression *l, ast_expression *r) : ast_binary_relation(p, l, r) {
     tag = AST_LESS_THAN;
@@ -119,8 +131,16 @@ ast_sub::ast_sub(position_information *p, ast_expression *l, ast_expression *r) 
     tag = AST_SUB;
 }
 
-// TODO: or if neccesary
-// TODO: and if neccesary
+ast_or::ast_or(position_information *p, ast_expression *l, ast_expression *r) :
+    ast_binary_operation(p, l, r) {
+    tag = AST_OR;
+}
+
+/* The ast_and class. */
+ast_and::ast_and(position_information *p, ast_expression *l, ast_expression *r) :
+    ast_binary_operation(p, l, r) {
+    tag = AST_AND;
+}
 
 ast_mult::ast_mult(position_information *p, ast_expression *l, ast_expression *r) : ast_binary_operation(p, l, r) {
     tag = AST_MULT;
@@ -131,7 +151,10 @@ ast_div::ast_div(position_information *p, ast_expression *l, ast_expression *r) 
 }
 
 // TODO: idiv if neccesary
-// TODO: mod if neccesary
+ast_mod::ast_mod(position_information *p, ast_expression *l, ast_expression *r) :
+    ast_binary_operation(p, l, r) {
+    tag = AST_MOD;
+}
 
 ast_id::ast_id(position_information *p, sym_index s) : ast_lval(p), sym_p(s) {
     tag = AST_ID;
@@ -304,7 +327,15 @@ void ast_procedure_call::print(ostream& o) {
     end_child(o);
 }
 
-// TODO: Ast assign
+void ast_assign::print(ostream &o) {
+    o << "Assignment (left, right)\n";
+    begin_child(o);
+    o << left << endl;
+    end_child(o);
+    last_child(o);
+    o << right;
+    end_child(o);
+}
 
 void ast_while::print(ostream& o) {
     o << "While (condition, body)\n";
@@ -350,12 +381,31 @@ void ast_function_call::print(ostream& o) {
 }
 
 // TODO: uminus
-// TODO: not
-// TODO: notequal
-// TODO: and
-// TODO: or
+void ast_not::print(ostream &o) {
+    o << "Not (expr) [" << short_symbols << sym_tab->get_symbol(type) << long_symbols << "]\n";
+    last_child(o);
+    o << expr;
+    end_child(o);
+}
+
+void ast_not_equal::print(ostream &o) {
+    xprint(o, "Not equal");
+}
+
+void ast_or::print(ostream &o) {
+    xprint(o, "Or");
+}
+
+void ast_and::print(ostream &o) {
+    xprint(o, "And");
+}
+
 // TODO: idiv
-// TODO: mod
+
+void ast_mod::print(ostream &o) {
+    xprint(o, "Mod");
+}
+
 
 void ast_equal::print(ostream& o) {
     xprint(o, "Equal");

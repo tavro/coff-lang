@@ -117,6 +117,36 @@ STR_ERR 	'([^'\n]|'')*\n
 				return T_DIV;
 			}
 
+(?i:do)		{
+                yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                return T_DO;
+			}
+(?i:or)		{
+                yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                return T_OR;
+			}
+(?i:and)	{
+                yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                return T_AND;
+			}
+(?i:mod)	{
+                yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                return T_MOD;
+			}
+(?i:not)	{
+                yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                return T_NOT;
+			}
 (?i:var)	{
 				yylloc.first_line = yylineno;
                 yylloc.first_column = column;

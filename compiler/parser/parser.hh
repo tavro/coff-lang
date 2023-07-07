@@ -73,19 +73,27 @@ extern int yydebug;
     T_DIV = 274,                   /* T_DIV  */
     T_IF = 275,                    /* T_IF  */
     T_VAR = 276,                   /* T_VAR  */
-    T_ELSE = 277,                  /* T_ELSE  */
-    T_CONST = 278,                 /* T_CONST  */
-    T_ARRAY = 279,                 /* T_ARRAY  */
-    T_WHILE = 280,                 /* T_WHILE  */
-    T_ELSEIF = 281,                /* T_ELSEIF  */
-    T_RETURN = 282,                /* T_RETURN  */
-    T_STRING = 283,                /* T_STRING  */
-    T_ID = 284,                    /* T_ID  */
-    T_PROGRAM = 285,               /* T_PROGRAM  */
-    T_PROCEDURE = 286,             /* T_PROCEDURE  */
-    T_FUNCTION = 287,              /* T_FUNCTION  */
-    T_INT = 288,                   /* T_INT  */
-    T_REAL = 289                   /* T_REAL  */
+    T_OF = 277,                    /* T_OF  */
+    T_DO = 278,                    /* T_DO  */
+    T_ASSIGN = 279,                /* T_ASSIGN  */
+    T_NOTEQ = 280,                 /* T_NOTEQ  */
+    T_OR = 281,                    /* T_OR  */
+    T_ELSE = 282,                  /* T_ELSE  */
+    T_CONST = 283,                 /* T_CONST  */
+    T_ARRAY = 284,                 /* T_ARRAY  */
+    T_AND = 285,                   /* T_AND  */
+    T_NOT = 286,                   /* T_NOT  */
+    T_MOD = 287,                   /* T_MOD  */
+    T_WHILE = 288,                 /* T_WHILE  */
+    T_ELSEIF = 289,                /* T_ELSEIF  */
+    T_RETURN = 290,                /* T_RETURN  */
+    T_STRING = 291,                /* T_STRING  */
+    T_ID = 292,                    /* T_ID  */
+    T_PROGRAM = 293,               /* T_PROGRAM  */
+    T_PROCEDURE = 294,             /* T_PROCEDURE  */
+    T_FUNCTION = 295,              /* T_FUNCTION  */
+    T_INT = 296,                   /* T_INT  */
+    T_REAL = 297                   /* T_REAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -116,7 +124,7 @@ union YYSTYPE
     pool_index          str;
     pool_index          pool_p;
 
-#line 120 "./parser/parser.hh"
+#line 128 "./parser/parser.hh"
 
 };
 typedef union YYSTYPE YYSTYPE;

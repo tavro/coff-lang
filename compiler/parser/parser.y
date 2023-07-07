@@ -46,14 +46,14 @@ extern bool assembler;
 }
 
 // NOTE: Desc may be a good idea
-%type <id>              id const_id rvar_id array_id proc_id func_id type_id // TODO: lvar_id
+%type <id>              id const_id lvar_id rvar_id array_id proc_id func_id type_id
 %type <statement_list>  stmt_list comp_stmt else_part
 %type <statement>       stmt
 %type <expression_list> opt_param_list param_list opt_expr_list expr_list
 %type <expression>      expr term factor simple_expr rvar
 %type <elseif_list>     elseif_list
 %type <elseif>          elseif
-// TODO: %type <lval>            lvar
+%type <lval>            lvar
 %type <param>           param
 %type <function_call>   func_call
 %type <function_head>   func_decl func_head
@@ -63,21 +63,22 @@ extern bool assembler;
 
 %token T_EOF T_ERROR T_DOT T_SEMICOLON T_EQ T_COLON T_LEFTBRACKET
 %token T_RIGHTBRACKET T_LEFTPAR T_RIGHTPAR T_COMMA T_LESSTHAN T_GREATERTHAN
-%token T_ADD T_SUB T_MULT T_DIV T_IF T_VAR // TODO: OF, DO, ASSIGN, NOT EQ, OR
-%token T_ELSE T_CONST T_ARRAY // TODO: end, and, not, then, mod
+%token T_ADD T_SUB T_MULT T_DIV T_IF T_VAR T_OF T_DO T_ASSIGN T_NOTEQ T_OR
+%token T_ELSE T_CONST T_ARRAY T_AND T_NOT T_MOD  // TODO: end, then
 %token T_WHILE T_ELSEIF T_RETURN // TODO: begin
 %token T_STRING
 %token <pool_p> T_ID T_PROGRAM T_PROCEDURE T_FUNCTION
 %token <ival> T_INT
 %token <rval> T_REAL
 
-// TODO: not, and, mod, or
+%left T_NOT
+%left T_AND
+%left T_OR
 %left T_ADD T_SUB
-%left T_MULT T_DIV
+%left T_MULT T_DIV T_MOD
 
 %start program
 
-// TODO: Implement rules
 %%
 
 program             : prog_decl subprog_part comp_stmt T_DOT
@@ -434,6 +435,10 @@ stmt                : T_IF expr stmt_list elseif_list else_part
                     {
                         $$ = new ast_procedure_call($1->pos, $1, $3);
                     }
+                    | lvar T_ASSIGN expr
+                    {
+                        $$ = new ast_assign($1->pos, $1, $3);
+                    }
                     | T_RETURN expr
                     {
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
@@ -444,13 +449,12 @@ stmt                : T_IF expr stmt_list elseif_list else_part
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
                         $$ = new ast_return(pos);
                     }
-                    | /* intentionally empty */ /* TODO: assignment */
+                    | /* intentionally empty */
                     {
                         $$ = NULL;
                     }
                     ;
 
-/*
 lvar                : lvar_id
                     {
                         $$ = $1;
@@ -464,7 +468,6 @@ lvar                : lvar_id
                         $$ = NULL;
                     }
                     ;
-*/
 
 rvar                : rvar_id
                     {
@@ -536,9 +539,9 @@ expr                : simple_expr
                     {
                         // $$ = new ast_equal($1->pos, $1, $3);
                     }
-                    | /* TODO: not eq */
+                    | expr T_NOTEQ simple_expr
                     {
-                        // TODO: not eq
+                        $$ = new ast_not_equal($1->pos, $1, $3);
                     }
                     | expr T_LESSTHAN simple_expr
                     {
@@ -562,9 +565,9 @@ simple_expr         : term
                     {
                         // TODO: uminus
                     }
-                    | /* TODO: or */
+                    | simple_expr T_OR term
                     {
-                        // TODO: or
+                        $$ = new ast_or($1->pos, $1, $3);
                     }
                     | simple_expr T_ADD term
                     {
@@ -580,9 +583,17 @@ term                : factor
                     {
                         $$ = $1;
                     }
-                    | /* TODO: and, idiv/rdiv, mod */
+                    | /* TODO: idiv/rdiv */
                     {
-                        // TODO: and, idiv/rdiv, mod
+                        // TODO: idiv/rdiv
+                    }
+                    | term T_MOD factor
+                    {
+                        $$ = new ast_mod($1->pos, $1, $3);
+                    }
+                    | term T_AND factor
+                    {
+                        $$ = new ast_and($1->pos, $1, $3);
                     }
                     | term T_MULT factor
                     {
@@ -610,9 +621,10 @@ factor              : rvar
                     {
                         $$ = $1;
                     }
-                    | /* TODO: not */
+                    | T_NOT factor
                     {
-                        // TODO: not
+                        position_information* pos = new position_information(@1.first_line, @1.first_column);
+		                $$ = new ast_not(pos, $2);
                     }
                     | T_LEFTPAR expr T_RIGHTPAR
                     {
@@ -662,7 +674,6 @@ const_id            : id
                     }
                     ;
 
-/*
 lvar_id             : id
                     {
                         if(sym_tab->get_symbol_tag($1->sym_p) != SYM_VAR && sym_tab->get_symbol_tag($1->sym_p) != SYM_PARAM) {
@@ -673,7 +684,6 @@ lvar_id             : id
                         $$ = $1;
                     }
                     ;
-*/
 
 rvar_id             : id
                     {

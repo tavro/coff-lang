@@ -241,10 +241,21 @@ sym_index semantic::check_binop2(ast_binary_operation* node, string s) {
     return int_type;
 }
 
-// TODO: Implement or
-// TODO: Implement and
+sym_index ast_or::type_check() {
+    type = type_checker->check_binop2(this, "MSG"); // TODO: Change message
+    return type;
+}
+
+sym_index ast_and::type_check() {
+    type = type_checker->check_binop2(this, "MSG"); // TODO: Change message
+    return type;
+}
+
+sym_index ast_mod::type_check() {
+    type = type_checker->check_binop2(this, "MSG"); // TODO: Change message
+    return type;
+}
 // TODO: Implement alt div
-// TODO: Implement mod
 
 sym_index semantic::check_binrel(ast_binary_relation *node) {
     sym_index left_type = node->left->type_check();
@@ -263,7 +274,9 @@ sym_index semantic::check_binrel(ast_binary_relation *node) {
     return int_type;
 }
 
-// TODO: Implement not equal
+sym_index ast_not_equal::type_check() {
+    return type_checker->check_binrel(this);
+}
 
 sym_index ast_equal::type_check() {
     return type_checker->check_binrel(this);
@@ -282,7 +295,21 @@ sym_index ast_procedure_call::type_check() {
     return void_type;
 }
 
-// TODO: Implement assign
+sym_index ast_assign::type_check() {
+    sym_index lhs_type = lhs->type_check();
+    sym_index rhs_type = rhs->type_check();
+
+    if(lhs_type != rhs_type) {
+        if(lhs_type == real_type && rhs_type == int_type) {
+            rhs = new ast_cast(rhs->pos,rhs);
+        }
+        else {
+            type_error(rhs->pos) << "Can't assign a real value to an int variable.\n";
+        }
+    }
+    
+    return void_type;
+}
 
 sym_index ast_while::type_check() {
     if(condition->type_check() != int_type) {
@@ -351,7 +378,16 @@ sym_index ast_function_call::type_check() {
 }
 
 // TODO: Implement uminus if nessessary
-// TODO: Implement not if nessessary
+
+sym_index ast_not::type_check() {
+    sym_index t = expr->type_check();
+    
+    if(t == void_type) {
+        type_error(pos) << "Type: NULL" << endl;
+    }
+
+    return t;
+}
 
 sym_index ast_elseif::type_check() {
     if(condition->type_check() != int_type) {
