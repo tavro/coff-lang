@@ -83,31 +83,31 @@ extern bool assembler;
 
 %%
 
-program             : prog_decl subprog_part comp_stmt
+program             : prog_decl comp_stmt
                     {
                         symbol *env = sym_tab->get_symbol($1->sym_p);
 
                         // following code depends on flags passed to compiler
                         if(type_check) {
-                            type_checker->do_typecheck(env, $3);
+                            type_checker->do_typecheck(env, $2);
                         }
 
                         if(print_ast) {
                             cout << "Unoptimized AST for global level" << endl;
-                            cout << (ast_statement_list *)$3 << endl;
+                            cout << (ast_statement_list *)$2 << endl;
                         }
 
                         if(optimize) {
-                            optimizer->do_optimize($3);
+                            optimizer->do_optimize($2);
                             if(print_ast) {
                                 cout << "\nOptimized AST for global level" << endl;
-                                cout << (ast_statement_list *)$3 << endl;
+                                cout << (ast_statement_list *)$2 << endl;
                             }
                         }
 
                         if(error_count == 0) {
                             if(quads) {
-                                quad_list *q = $1->do_quads($3);
+                                quad_list *q = $1->do_quads($2);
                                 if(print_quads) {
                                     cout << "\nQuad list for global level" << endl;
                                     cout << (quad_list *)q << endl;
@@ -128,7 +128,7 @@ program             : prog_decl subprog_part comp_stmt
                     }
                     ;
 
-prog_decl           : prog_head T_COLON const_part var_part
+prog_decl           : prog_head T_COLON
                     {
                         $$ = $1;
                     }
@@ -145,7 +145,7 @@ prog_head           : T_PROGRAM T_ID
                     }
                     ;
 
-const_part          : T_CONST T_COLON const_decls
+const_part          : T_CONST const_decls
                     | error const_decls
                     | /* empty */
                     ;
@@ -191,7 +191,7 @@ const_decl          : T_ID T_EQ integer T_SEMICOLON
                     }
                     ;
 
-var_part            : T_VAR T_COLON var_decls
+var_part            : T_VAR var_decls
                     | /* intentionally empty */
                     ;
 
@@ -240,30 +240,30 @@ subprog_decls       : subprog_decl
                     | subprog_decls subprog_decl
                     ;
 
-subprog_decl        : proc_decl subprog_part comp_stmt
+subprog_decl        : proc_decl comp_stmt
                     {
                         symbol *env = sym_tab->get_symbol($1->sym_p);
 
                         if(type_check) {
-                            type_checker->do_typecheck(env, $3);
+                            type_checker->do_typecheck(env, $2);
                         }
 
                         if(print_ast) {
                             cout << "\nUnoptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
-                            cout << (ast_statement_list *)$3 << endl;
+                            cout << (ast_statement_list *)$2 << endl;
                         }
 
                         if(optimize) {
-                            optimizer->do_optimize($3);
+                            optimizer->do_optimize($2);
                             if(print_ast) {
                                 cout << "\nOptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
-                                cout << (ast_statement_list*)$3 << endl;
+                                cout << (ast_statement_list*)$2 << endl;
                             }
                         }
 
                         if(error_count == 0) {
                             if(quads) {
-                                quad_list *q = $1->do_quads($3);
+                                quad_list *q = $1->do_quads($2);
                                 if(print_quads) {
                                     cout << "\nQuad list for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
                                     cout << (quad_list *)q << endl;
@@ -278,30 +278,30 @@ subprog_decl        : proc_decl subprog_part comp_stmt
 
                         sym_tab->close_scope();
                     }
-                    | func_decl subprog_part comp_stmt
+                    | func_decl comp_stmt
                     {
                         symbol *env = sym_tab->get_symbol($1->sym_p);
 
                         if(type_check) {
-                            type_checker->do_typecheck(env, $3);
+                            type_checker->do_typecheck(env, $2);
                         }
 
                         if(print_ast) {
                             cout << "\nUnoptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
-                            cout << (ast_statement_list *)$3 << endl;
+                            cout << (ast_statement_list *)$2 << endl;
                         }
 
                         if(optimize) {
-                            optimizer->do_optimize($3);
+                            optimizer->do_optimize($2);
                             if(print_ast) {
                                 cout << "\nOptimized AST for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
-                                cout << (ast_statement_list*)$3 << endl;
+                                cout << (ast_statement_list*)$2 << endl;
                             }
                         }
 
                         if(error_count == 0) {
                             if(quads) {
-                                quad_list *q = $1->do_quads($3);
+                                quad_list *q = $1->do_quads($2);
                                 if(print_quads) {
                                     cout << "\nQuad list for \"" << sym_tab->pool_lookup(env->id) << "\"" << endl;
                                     cout << (quad_list *)q << endl;
@@ -391,10 +391,9 @@ param               : T_ID T_COLON type_id
                     }
                     ;
 
-comp_stmt           : T_CURLYLEFT stmt_list T_CURLYRIGHT
+comp_stmt           : T_CURLYLEFT const_part var_part subprog_part stmt_list T_CURLYRIGHT
                     {
-                        // TODO: Look over this, may need begin and end keywords
-                        $$ = $2;
+                        $$ = $5;
                     }
                     ;
 

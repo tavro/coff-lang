@@ -1,28 +1,23 @@
-prog main:
+prog main: {
 
-    con:
-        pi = 3.14159;
+con pi = 3.14159;
 
-    var:
-        o: real;
-        r: real;
+var o: real;
+    r: real;
 
-    subprog:
-        proc init:
-        {
-            r := 2;
-        }
+subprog:
+    proc init: {
+        r := 2;
+    }
+    
+    func omkrets(radie: real): real: {
+        subprog:
+            func diameter: real: {
+                ret 2.0 * radie;
+            }
         
-        func omkrets(radie: real): real:
-            subprog:
-                func diameter: real:
-                {
-                    ret 2.0 * radie;
-                }
-        {
-            ret diameter() * pi;
-        }
-{
+        ret diameter() * pi;
+    }
 
 init();
 o := omkrets(r);

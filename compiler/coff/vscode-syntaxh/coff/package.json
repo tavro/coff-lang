@@ -1,0 +1,25 @@
+{
+  "name": "coff",
+  "displayName": "coff-lang",
+  "description": "coff programming language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "coff",
+      "aliases": ["coff programming language", "coff"],
+      "extensions": [".coff"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "coff",
+      "scopeName": "source.coff",
+      "path": "./syntaxes/coff.tmLanguage.json"
+    }]
+  }
+}

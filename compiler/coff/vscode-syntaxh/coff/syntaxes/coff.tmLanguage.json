@@ -1,0 +1,32 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "coff programming language",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.coff",
+				"match": "\\b(if|while|for|ret|prog|subprog|proc|func|con|var)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.coff",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.coff",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.coff"
+}
