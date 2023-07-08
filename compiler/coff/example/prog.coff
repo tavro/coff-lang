@@ -1,6 +1,6 @@
 prog main: {
 
-con pi = 3.14159;
+con PI = 3.14159;
 
 var o: real;
     r: real;
@@ -16,7 +16,7 @@ subprog:
                 ret 2.0 * radie;
             }
         
-        ret diameter() * pi;
+        ret diameter() * PI;
     }
 
 init();
