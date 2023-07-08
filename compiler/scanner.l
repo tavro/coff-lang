@@ -74,6 +74,18 @@ STR_ERR 	'([^'\n]|'')*\n
 				column += yyleng;
 				return T_RIGHTBRACKET;
 			}
+\{			{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				return T_CURLYLEFT;	
+			}
+\}			{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				return T_CURLYRIGHT;
+			}
 ,			{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
@@ -116,7 +128,18 @@ STR_ERR 	'([^'\n]|'')*\n
 				column += yyleng;
 				return T_DIV;
 			}
-
+":="        {
+                yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                return T_ASSIGN;
+            }
+"!="        {
+                yylloc.first_line = yylineno;
+                yylloc.first_column = column;
+                column += yyleng;
+                return T_NOTEQ;
+            }
 (?i:do)		{
                 yylloc.first_line = yylineno;
                 yylloc.first_column = column;
@@ -171,7 +194,7 @@ STR_ERR 	'([^'\n]|'')*\n
 				column += yyleng;
 				return T_ELSEIF;
 			}
-(?i:const)	{
+(?i:con)	{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
@@ -183,30 +206,36 @@ STR_ERR 	'([^'\n]|'')*\n
 				column += yyleng;
 				return T_WHILE;
 			}
-(?i:return)	{
+(?i:ret)	{
 				yylloc.first_line = yylineno;
 				yylloc.first_column = column;
 				column += yyleng;
 				return T_RETURN;
 			}
-(?i:program) 	{
+(?i:prog) 	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				return T_PROGRAM;
+			}
+(?i:subprog)	{
 					yylloc.first_line = yylineno;
 					yylloc.first_column = column;
 					column += yyleng;
-					return T_PROGRAM;
-			 	}
-(?i:function)	{
-					yylloc.first_line = yylineno;
-					yylloc.first_column = column;
-					column += yyleng;
-					return T_FUNCTION;
+					return T_SUBPROG;
 				}
-(?i:procedure)	{
-					yylloc.first_line = yylineno;
-					yylloc.first_column = column;
-					column += yyleng;
-					return T_PROCEDURE;
-				}
+(?i:func)	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				return T_FUNCTION;
+			}
+(?i:proc)	{
+				yylloc.first_line = yylineno;
+				yylloc.first_column = column;
+				column += yyleng;
+				return T_PROCEDURE;
+			}
 (?i:array)		{
 					yylloc.first_line = yylineno;
 					yylloc.first_column = column;

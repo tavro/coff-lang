@@ -95,7 +95,7 @@ ast_return::ast_return(position_information *p, ast_expression *v) : ast_stateme
     tag = AST_RETURN;
 }
 
-ast_function_call::ast_function_call(position_information *p, ast_id *i, ast_expression_list *par) : ast_expression(p), id(i), param_list(par) {
+ast_function_call::ast_function_call(position_information *p, ast_id *i, ast_expression_list *par) : ast_expression(p, i->type), id(i), param_list(par) {
     tag = AST_FUNCTION_CALL;
 }
 
@@ -330,10 +330,10 @@ void ast_procedure_call::print(ostream& o) {
 void ast_assign::print(ostream &o) {
     o << "Assignment (left, right)\n";
     begin_child(o);
-    o << left << endl;
+    o << lhs << endl;
     end_child(o);
     last_child(o);
-    o << right;
+    o << rhs;
     end_child(o);
 }
 

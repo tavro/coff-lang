@@ -62,15 +62,17 @@ extern bool assembler;
 %type <real>            real
 
 %token T_EOF T_ERROR T_DOT T_SEMICOLON T_EQ T_COLON T_LEFTBRACKET
-%token T_RIGHTBRACKET T_LEFTPAR T_RIGHTPAR T_COMMA T_LESSTHAN T_GREATERTHAN
+%token T_RIGHTBRACKET T_LEFTPAR T_RIGHTPAR T_COMMA T_LESSTHAN T_GREATERTHAN T_CURLYLEFT T_CURLYRIGHT
 %token T_ADD T_SUB T_MULT T_DIV T_IF T_VAR T_OF T_DO T_ASSIGN T_NOTEQ T_OR
-%token T_ELSE T_CONST T_ARRAY T_AND T_NOT T_MOD  // TODO: end, then
-%token T_WHILE T_ELSEIF T_RETURN // TODO: begin
+%token T_ELSE T_CONST T_ARRAY T_AND T_NOT T_MOD
+%token T_WHILE T_ELSEIF T_RETURN
 %token T_STRING
+%token T_SUBPROG
 %token <pool_p> T_ID T_PROGRAM T_PROCEDURE T_FUNCTION
 %token <ival> T_INT
 %token <rval> T_REAL
 
+%nonassoc T_LESSTHAN T_GREATERTHAN T_EQ T_NOTEQ
 %left T_NOT
 %left T_AND
 %left T_OR
@@ -81,7 +83,7 @@ extern bool assembler;
 
 %%
 
-program             : prog_decl subprog_part comp_stmt T_DOT
+program             : prog_decl subprog_part comp_stmt
                     {
                         symbol *env = sym_tab->get_symbol($1->sym_p);
 
@@ -126,7 +128,7 @@ program             : prog_decl subprog_part comp_stmt T_DOT
                     }
                     ;
 
-prog_decl           : prog_head T_SEMICOLON const_part var_part
+prog_decl           : prog_head T_COLON const_part var_part
                     {
                         $$ = $1;
                     }
@@ -143,7 +145,7 @@ prog_head           : T_PROGRAM T_ID
                     }
                     ;
 
-const_part          : T_CONST const_decls
+const_part          : T_CONST T_COLON const_decls
                     | error const_decls
                     | /* empty */
                     ;
@@ -189,7 +191,7 @@ const_decl          : T_ID T_EQ integer T_SEMICOLON
                     }
                     ;
 
-var_part            : T_VAR var_decls
+var_part            : T_VAR T_COLON var_decls
                     | /* intentionally empty */
                     ;
 
@@ -230,7 +232,7 @@ var_decl            : T_ID T_COLON type_id T_SEMICOLON
                     }
                     ;
 
-subprog_part        : subprog_decls
+subprog_part        : T_SUBPROG T_COLON subprog_decls
                     | /* intentionally empty */
                     ;
                 
@@ -238,7 +240,7 @@ subprog_decls       : subprog_decl
                     | subprog_decls subprog_decl
                     ;
 
-subprog_decl        : proc_decl subprog_part comp_stmt T_SEMICOLON
+subprog_decl        : proc_decl subprog_part comp_stmt
                     {
                         symbol *env = sym_tab->get_symbol($1->sym_p);
 
@@ -276,7 +278,7 @@ subprog_decl        : proc_decl subprog_part comp_stmt T_SEMICOLON
 
                         sym_tab->close_scope();
                     }
-                    | func_decl subprog_part comp_stmt T_SEMICOLON
+                    | func_decl subprog_part comp_stmt
                     {
                         symbol *env = sym_tab->get_symbol($1->sym_p);
 
@@ -316,13 +318,13 @@ subprog_decl        : proc_decl subprog_part comp_stmt T_SEMICOLON
                     }
                     ;
 
-proc_decl           : proc_head opt_param_list T_SEMICOLON const_part var_part
+proc_decl           : proc_head opt_param_list T_COLON const_part var_part
                     {
                         $$ = $1;
                     }
                     ;
 
-func_decl           : func_head opt_param_list T_COLON type_id T_SEMICOLON const_part var_part
+func_decl           : func_head opt_param_list T_COLON type_id T_COLON const_part var_part
                     {
                         sym_tab->get_symbol($1->sym_p)->type = $4->sym_p;
                         $$ = $1;
@@ -347,7 +349,7 @@ proc_head           : T_PROCEDURE T_ID
 func_head           : T_FUNCTION T_ID
                     {
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
-                        sym_index func_loc = sym_tab->enter_procedure(pos, $2);
+                        sym_index func_loc = sym_tab->enter_function(pos, $2);
                         sym_tab->open_scope();
                         $$ = new ast_function_head(pos, func_loc);
                     }
@@ -389,10 +391,10 @@ param               : T_ID T_COLON type_id
                     }
                     ;
 
-comp_stmt           : stmt_list
+comp_stmt           : T_CURLYLEFT stmt_list T_CURLYRIGHT
                     {
                         // TODO: Look over this, may need begin and end keywords
-                        $$ = $1;
+                        $$ = $2;
                     }
                     ;
 
@@ -537,7 +539,7 @@ expr                : simple_expr
                     }
                     | expr T_EQ simple_expr
                     {
-                        // $$ = new ast_equal($1->pos, $1, $3);
+                        $$ = new ast_equal($1->pos, $1, $3);
                     }
                     | expr T_NOTEQ simple_expr
                     {
@@ -545,11 +547,11 @@ expr                : simple_expr
                     }
                     | expr T_LESSTHAN simple_expr
                     {
-                        // $$ = new ast_less_than($1->pos, $1, $3);
+                        $$ = new ast_less_than($1->pos, $1, $3);
                     }
                     | expr T_GREATERTHAN simple_expr
                     {
-                        // $$ = new ast_greater_than($1->pos, $1, $3);
+                        $$ = new ast_greater_than($1->pos, $1, $3);
                     }
                     ;
 

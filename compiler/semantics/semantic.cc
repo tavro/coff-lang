@@ -163,34 +163,36 @@ sym_index ast_indexed::type_check() {
 }
 
 // NOTE: Write description
-sym_index semantic::check_binop1(ast_binary_operation *binop) {
-    // TODO: This is ugly, needs to be rewritten
-    sym_index left = binop->left->type_check();
-    sym_index right = binop->right->type_check();
+sym_index semantic::check_binop1(ast_binary_operation *node)
+{
+    sym_index left_type = node->left->type_check();
+    sym_index right_type = node->right->type_check();
 
     bool fail = false;
-    if(left == void_type) {
-        type_error(binop->left->pos) << "Left operand must not be void" << endl;
+    if (left_type == void_type) {
+        type_error(node->left->pos) << "First operand is of type void\n";
         fail = true;
     }
 
-    if(right == void_type) {
-        type_error(binop->right->pos) << "Right operand must not be void" << endl;
+    if (right_type == void_type) {
+        type_error(node->right->pos) << "Second operand is of type void\n";
         fail = true;
     }
-
-    if(left != right && !fail) {
-        if(left == int_type) {
-            binop->left = new ast_cast(binop->left->pos, binop->left);
+    
+    if ( left_type != right_type && !fail ) {
+        if (left_type == int_type) {
+            node->left = new ast_cast(node->left->pos, node->left);
+            return real_type;
         }
         else {
-            binop->right = new ast_cast(binop->right->pos, binop->right);
+            node->right = new ast_cast(node->right->pos, node->right);
+            return real_type;
         }
-        return real_type;
     }
 
-    return left;
+    return left_type;
 }
+
 
 sym_index ast_add::type_check() {
     type = type_checker->check_binop1(this);
@@ -299,13 +301,19 @@ sym_index ast_assign::type_check() {
     sym_index lhs_type = lhs->type_check();
     sym_index rhs_type = rhs->type_check();
 
+    if(lhs_type == void_type) {
+        type_error(lhs->pos) << "Left operand must not be void" << endl;
+    }
+
+    if(rhs_type == void_type) {
+        type_error(rhs->pos) << "Right operand must not be void" << endl;
+    }
+
     if(lhs_type != rhs_type) {
         if(lhs_type == real_type && rhs_type == int_type) {
             rhs = new ast_cast(rhs->pos,rhs);
         }
-        else {
-            type_error(rhs->pos) << "Can't assign a real value to an int variable.\n";
-        }
+        // TODO: error handling
     }
     
     return void_type;
@@ -366,7 +374,7 @@ sym_index ast_return::type_check() {
     function_symbol *func = tmp->get_function_symbol();
 
     if(func->type != value_type) {
-        type_error(pos) << "Bad return type from function." << endl;
+        type_error(value->pos) << "Bad return type from function." << endl;
     }
 
     return void_type;

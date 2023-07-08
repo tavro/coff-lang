@@ -115,12 +115,14 @@ sym_index symbol_table::gen_temp_var(sym_index type) {
     string name = "$" + to_string(++sym_tab->temp_nr);
 
     // TODO: this is just me being lazy, fix this
+    /*
     if (to_string(sym_tab->temp_nr).length() == 2) {
         name = name + "     ";
     }
     else if (to_string(sym_tab->temp_nr).length() == 1) {
         name = name + "      ";
     }
+    */
 
     pool_index pool_p = pool_install((char*)name.c_str());
 
@@ -336,7 +338,7 @@ pool_index symbol_table::pool_install(char *s) {
     string_pool[pool_pos] = '\0';
 
     strcpy(string_pool+pool_pos, s); // the string itself
-    pool_pos += strlen(s) + 1;
+    pool_pos += strlen(s);
 
     return old_pos;
 }

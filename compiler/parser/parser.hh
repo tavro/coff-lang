@@ -67,33 +67,36 @@ extern int yydebug;
     T_COMMA = 268,                 /* T_COMMA  */
     T_LESSTHAN = 269,              /* T_LESSTHAN  */
     T_GREATERTHAN = 270,           /* T_GREATERTHAN  */
-    T_ADD = 271,                   /* T_ADD  */
-    T_SUB = 272,                   /* T_SUB  */
-    T_MULT = 273,                  /* T_MULT  */
-    T_DIV = 274,                   /* T_DIV  */
-    T_IF = 275,                    /* T_IF  */
-    T_VAR = 276,                   /* T_VAR  */
-    T_OF = 277,                    /* T_OF  */
-    T_DO = 278,                    /* T_DO  */
-    T_ASSIGN = 279,                /* T_ASSIGN  */
-    T_NOTEQ = 280,                 /* T_NOTEQ  */
-    T_OR = 281,                    /* T_OR  */
-    T_ELSE = 282,                  /* T_ELSE  */
-    T_CONST = 283,                 /* T_CONST  */
-    T_ARRAY = 284,                 /* T_ARRAY  */
-    T_AND = 285,                   /* T_AND  */
-    T_NOT = 286,                   /* T_NOT  */
-    T_MOD = 287,                   /* T_MOD  */
-    T_WHILE = 288,                 /* T_WHILE  */
-    T_ELSEIF = 289,                /* T_ELSEIF  */
-    T_RETURN = 290,                /* T_RETURN  */
-    T_STRING = 291,                /* T_STRING  */
-    T_ID = 292,                    /* T_ID  */
-    T_PROGRAM = 293,               /* T_PROGRAM  */
-    T_PROCEDURE = 294,             /* T_PROCEDURE  */
-    T_FUNCTION = 295,              /* T_FUNCTION  */
-    T_INT = 296,                   /* T_INT  */
-    T_REAL = 297                   /* T_REAL  */
+    T_CURLYLEFT = 271,             /* T_CURLYLEFT  */
+    T_CURLYRIGHT = 272,            /* T_CURLYRIGHT  */
+    T_ADD = 273,                   /* T_ADD  */
+    T_SUB = 274,                   /* T_SUB  */
+    T_MULT = 275,                  /* T_MULT  */
+    T_DIV = 276,                   /* T_DIV  */
+    T_IF = 277,                    /* T_IF  */
+    T_VAR = 278,                   /* T_VAR  */
+    T_OF = 279,                    /* T_OF  */
+    T_DO = 280,                    /* T_DO  */
+    T_ASSIGN = 281,                /* T_ASSIGN  */
+    T_NOTEQ = 282,                 /* T_NOTEQ  */
+    T_OR = 283,                    /* T_OR  */
+    T_ELSE = 284,                  /* T_ELSE  */
+    T_CONST = 285,                 /* T_CONST  */
+    T_ARRAY = 286,                 /* T_ARRAY  */
+    T_AND = 287,                   /* T_AND  */
+    T_NOT = 288,                   /* T_NOT  */
+    T_MOD = 289,                   /* T_MOD  */
+    T_WHILE = 290,                 /* T_WHILE  */
+    T_ELSEIF = 291,                /* T_ELSEIF  */
+    T_RETURN = 292,                /* T_RETURN  */
+    T_STRING = 293,                /* T_STRING  */
+    T_SUBPROG = 294,               /* T_SUBPROG  */
+    T_ID = 295,                    /* T_ID  */
+    T_PROGRAM = 296,               /* T_PROGRAM  */
+    T_PROCEDURE = 297,             /* T_PROCEDURE  */
+    T_FUNCTION = 298,              /* T_FUNCTION  */
+    T_INT = 299,                   /* T_INT  */
+    T_REAL = 300                   /* T_REAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -124,7 +127,7 @@ union YYSTYPE
     pool_index          str;
     pool_index          pool_p;
 
-#line 128 "./parser/parser.hh"
+#line 131 "./parser/parser.hh"
 
 };
 typedef union YYSTYPE YYSTYPE;

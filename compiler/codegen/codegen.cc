@@ -63,6 +63,12 @@ void code_generator::prologue(symbol *new_env) {
         return;
     }
 
+    STREAM << "L" << label_nr << ":" << "\t\t\t" << "# " << sym_tab->pool_lookup(new_env->id) << endl;
+
+    if (assembler_trace) {
+        STREAM << "\t" << "# PROLOGUE (" << short_symbols << new_env << long_symbols << ")" << endl;
+    }
+
     // TODO: Probably have to rewrite this i'm not that good at assembly
 
     STREAM << "\t\t" << "push" << "\t" << "rbp" << endl;

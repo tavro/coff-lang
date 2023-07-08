@@ -1,8 +1,94 @@
+L4:			# INIT
+		push	rbp
+		mov	rcx, rsp
+		push	[rbp-8]
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 16
+		mov	rax, 2
+		mov	rcx, [rbp-16]
+		mov	[rcx--24], rax
+		mov	rcx, [rbp-16]
+		fild	qword ptr [rcx-24]
+		mov	rcx, [rbp-16]
+		fstp	qword ptr [rcx-32]
+		jmp	L14
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-32]
+		mov	rcx, [rbp-8]
+		mov	[rcx--24], rax
+L5:
+		leave	
+		ret	
+L7:			# DIAMETER
+		push	rbp
+		mov	rcx, rsp
+		push	[rbp-8]
+		push	[rbp-16]
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 16
+		mov	rax, 4611686018427387904
+		mov	rcx, [rbp-24]
+		mov	[rcx--32], rax
+		mov	rcx, [rbp-24]
+		fld	qword ptr [rcx-32]
+		mov	rcx, [rbp-16]
+		fld	qword ptr [rcx+16]
+		fmulp
+		mov	rcx, [rbp-24]
+		fstp	qword ptr [rcx-40]
+		mov	rcx, [rbp-24]
+		mov	rax, [rcx-40]
+		jmp	L8
+L8:
+		leave	
+		ret	
+L6:			# OMKRETS
+		push	rbp
+		mov	rcx, rsp
+		push	[rbp-8]
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 16
+		call	L7	# DIAMETER
+		add	rsp, 0
+		mov	rcx, [rbp-16]
+		mov	[rcx--24], rax
+		mov	rcx, [rbp-16]
+		fld	qword ptr [rcx-24]
+		mov	rcx, 4614256650576692846
+		push	rcx
+		fld	qword ptr [rsp]
+		add	rsp, 8
+		fmulp
+		mov	rcx, [rbp-16]
+		fstp	qword ptr [rcx-32]
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-32]
+		jmp	L9
+L9:
+		leave	
+		ret	
+L3:			# MAIN
 		push	rbp
 		mov	rcx, rsp
 		push	rcx
 		mov	rbp, rcx
-		sub	rsp, 0
-L4:
+		sub	rsp, 24
+		call	L4	# INIT
+		add	rsp, 0
+		mov	rcx, [rbp-8]
+		mov	rax, [rcx-24]
+		push	rax
+		call	L6	# OMKRETS
+		add	rsp, 8
+		mov	rcx, [rbp-8]
+		mov	[rcx--32], rax
+		mov	rcx, [rbp-8]
+		mov	rax, [rcx-32]
+		mov	rcx, [rbp-8]
+		mov	[rcx--16], rax
+L10:
 		leave	
 		ret	

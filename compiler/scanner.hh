@@ -59,6 +59,10 @@ typedef struct {
 #define T_OR            292 // or
 #define T_DO            293 // do
 
+#define T_CURLYRIGHT    294 // }
+#define T_CURLYLEFT     295 // {
+#define T_SUBPROG       296 // subprogram
+
 #define NR_SYMBOLS      99
 
 extern YYSTYPE yylval; // additional info for certain tokens
