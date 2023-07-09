@@ -57,7 +57,8 @@ token_name tokens[] = {
     { T_MOD,          "T_MOD" },
     { T_OR,           "T_OR" },
     { T_DO,           "T_DO" },
-    { T_SUBPROG,      "T_SUBPROG" }
+    { T_SUBPROG,      "T_SUBPROG" },
+    { T_MAIN,         "T_MAIN" }
 };
 
 const int nr_tokens = sizeof(tokens) / sizeof(*tokens);

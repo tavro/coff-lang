@@ -1,26 +1,44 @@
-prog main: {
+prog program {
 
-con SIZE = 1000;
+    con SIZE = 1000;
 
-var list: array[SIZE] real;
+    var list: array[SIZE] real;
+        x: real;
 
-subprog:
-    func half(foo: int; bar: int): int {
-        return foo / bar;
+    subprog:
+        func half(foo: int; bar: int): real {
+            ret foo / bar;
+        }
+
+        proc loop(stop: int; start: int; val: int) {
+            var i: int;
+
+            // i := start;
+            while(i < stop) {
+                list[i] := val;
+                i := i + 1;
+            }
+        }
+
+        func check: int {
+            var z: int;
+            
+            // z := 0;
+            while(z < SIZE) {
+                if(list[z] != 17.0)
+                    ret 0;
+                z := z + 1;
+            }
+
+            //ret 1;
+        }
+
+        func zero: int {
+            ret 0;
+        }
+
+    main {
+        x := half(SIZE*2,2);
     }
 
-    proc loop(stop: int; start: int; val: int) {
-        var i: int;
-        // TODO ifstatement & loop
-    }
-
-    func check: int {
-        ret 1;
-    }
-
-    func zero: int {
-        ret 0;
-    }
-
-// TODO call functions and procedures
 }

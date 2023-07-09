@@ -47,7 +47,7 @@ extern bool assembler;
 
 // NOTE: Desc may be a good idea
 %type <id>              id const_id lvar_id rvar_id array_id proc_id func_id type_id
-%type <statement_list>  stmt_list comp_stmt else_part
+%type <statement_list>  stmt_list comp_stmt main_comp_stmt else_part
 %type <statement>       stmt
 %type <expression_list> opt_param_list param_list opt_expr_list expr_list
 %type <expression>      expr term factor simple_expr rvar
@@ -67,7 +67,7 @@ extern bool assembler;
 %token T_ELSE T_CONST T_ARRAY T_AND T_NOT T_MOD
 %token T_WHILE T_ELSEIF T_RETURN
 %token T_STRING
-%token T_SUBPROG
+%token T_SUBPROG T_MAIN
 %token <pool_p> T_ID T_PROGRAM T_PROCEDURE T_FUNCTION
 %token <ival> T_INT
 %token <rval> T_REAL
@@ -83,7 +83,7 @@ extern bool assembler;
 
 %%
 
-program             : prog_decl comp_stmt
+program             : prog_decl main_comp_stmt
                     {
                         symbol *env = sym_tab->get_symbol($1->sym_p);
 
@@ -128,7 +128,7 @@ program             : prog_decl comp_stmt
                     }
                     ;
 
-prog_decl           : prog_head T_COLON
+prog_decl           : prog_head
                     {
                         $$ = $1;
                     }
@@ -318,13 +318,13 @@ subprog_decl        : proc_decl comp_stmt
                     }
                     ;
 
-proc_decl           : proc_head opt_param_list T_COLON const_part var_part
+proc_decl           : proc_head opt_param_list
                     {
                         $$ = $1;
                     }
                     ;
 
-func_decl           : func_head opt_param_list T_COLON type_id T_COLON const_part var_part
+func_decl           : func_head opt_param_list T_COLON type_id
                     {
                         sym_tab->get_symbol($1->sym_p)->type = $4->sym_p;
                         $$ = $1;
@@ -397,6 +397,12 @@ comp_stmt           : T_CURLYLEFT const_part var_part subprog_part stmt_list T_C
                     }
                     ;
 
+main_comp_stmt      : T_CURLYLEFT const_part var_part subprog_part T_MAIN T_CURLYLEFT stmt_list T_CURLYRIGHT T_CURLYRIGHT
+                    {
+                        $$ = $7;
+                    }
+                    ;
+
 stmt_list           : stmt
                     {
                         if($1 != NULL) {
@@ -426,11 +432,10 @@ stmt                : T_IF expr stmt_list elseif_list else_part
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
                         $$ = new ast_if(pos, $2, $3, $4, $5);
                     }
-                    | T_WHILE expr stmt_list
+                    | T_WHILE expr T_CURLYLEFT stmt_list T_CURLYRIGHT
                     {
-                        // TODO: may need end keyword
                         position_information* pos = new position_information(@1.first_line, @1.first_column);
-                        $$ = new ast_while(pos, $2, $3);
+                        $$ = new ast_while(pos, $2, $4);
                     }
                     | proc_id T_LEFTPAR opt_expr_list T_RIGHTPAR
                     {

@@ -41,7 +41,8 @@ enum ast_node_types {
     AST_OR,
     AST_DO,
     AST_ASSIGN,
-    AST_NOT_EQUAL
+    AST_NOT_EQUAL,
+    AST_MAIN
 };
 typedef enum ast_node_types ast_node_type;
 

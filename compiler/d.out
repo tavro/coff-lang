@@ -1,94 +1,218 @@
-L4:			# INIT
+L4:			# HALF
 		push	rbp
 		mov	rcx, rsp
 		push	[rbp-8]
-		push	rcx
-		mov	rbp, rcx
-		sub	rsp, 16
-		mov	rax, 2
-		mov	rcx, [rbp-16]
-		mov	[rcx--24], rax
-		mov	rcx, [rbp-16]
-		fild	qword ptr [rcx-24]
-		mov	rcx, [rbp-16]
-		fstp	qword ptr [rcx-32]
-		jmp	L14
-		mov	rcx, [rbp-16]
-		mov	rax, [rcx-32]
-		mov	rcx, [rbp-8]
-		mov	[rcx--24], rax
-L5:
-		leave	
-		ret	
-L7:			# DIAMETER
-		push	rbp
-		mov	rcx, rsp
-		push	[rbp-8]
-		push	[rbp-16]
-		push	rcx
-		mov	rbp, rcx
-		sub	rsp, 16
-		mov	rax, 4611686018427387904
-		mov	rcx, [rbp-24]
-		mov	[rcx--32], rax
-		mov	rcx, [rbp-24]
-		fld	qword ptr [rcx-32]
-		mov	rcx, [rbp-16]
-		fld	qword ptr [rcx+16]
-		fmulp
-		mov	rcx, [rbp-24]
-		fstp	qword ptr [rcx-40]
-		mov	rcx, [rbp-24]
-		mov	rax, [rcx-40]
-		jmp	L8
-L8:
-		leave	
-		ret	
-L6:			# OMKRETS
-		push	rbp
-		mov	rcx, rsp
-		push	[rbp-8]
-		push	rcx
-		mov	rbp, rcx
-		sub	rsp, 16
-		call	L7	# DIAMETER
-		add	rsp, 0
-		mov	rcx, [rbp-16]
-		mov	[rcx--24], rax
-		mov	rcx, [rbp-16]
-		fld	qword ptr [rcx-24]
-		mov	rcx, 4614256650576692846
-		push	rcx
-		fld	qword ptr [rsp]
-		add	rsp, 8
-		fmulp
-		mov	rcx, [rbp-16]
-		fstp	qword ptr [rcx-32]
-		mov	rcx, [rbp-16]
-		mov	rax, [rcx-32]
-		jmp	L9
-L9:
-		leave	
-		ret	
-L3:			# MAIN
-		push	rbp
-		mov	rcx, rsp
 		push	rcx
 		mov	rbp, rcx
 		sub	rsp, 24
-		call	L4	# INIT
-		add	rsp, 0
-		mov	rcx, [rbp-8]
+		mov	rcx, [rbp-16]
+		fild	qword ptr [rcx+16]
+		mov	rcx, [rbp-16]
+		fstp	qword ptr [rcx-24]
+		jmp	L14
+		mov	rcx, [rbp-16]
+		fild	qword ptr [rcx+24]
+		mov	rcx, [rbp-16]
+		fstp	qword ptr [rcx-32]
+		jmp	L15
+		mov	rcx, [rbp-16]
+		fld	qword ptr [rcx-24]
+		mov	rcx, [rbp-16]
+		fld	qword ptr [rcx-32]
+		fdivp
+		mov	rcx, [rbp-16]
+		fstp	qword ptr [rcx-40]
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-40]
+		jmp	L5
+L5:
+		leave	
+		ret	
+L6:			# LOOP
+		push	rbp
+		mov	rcx, rsp
+		push	[rbp-8]
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 48
+L8:
+		mov	rcx, [rbp-16]
 		mov	rax, [rcx-24]
-		push	rax
-		call	L6	# OMKRETS
-		add	rsp, 8
-		mov	rcx, [rbp-8]
+		mov	rcx, [rbp-16]
+		mov	rcx, [rcx+16]
+		cmp	rax, rcx
+		jl	L10
+		mov	rax, 0
+		jmp	L11
+		L10:
+		mov	rax, 1
+		L11:
+		mov	rcx, [rbp-16]
 		mov	[rcx--32], rax
-		mov	rcx, [rbp-8]
+		mov	rcx, [rbp-16]
 		mov	rax, [rcx-32]
+		cmp	rax, 0
+		je	L9
+		mov	rcx, [rbp-16]
+		fild	qword ptr [rcx+32]
+		mov	rcx, [rbp-16]
+		fstp	qword ptr [rcx-40]
+		jmp	L22
 		mov	rcx, [rbp-8]
-		mov	[rcx--16], rax
-L10:
+		sub	rcx, 16
+		mov	rax, rcx
+		mov	rcx, [rbp-16]
+		mov	rcx, [rcx-24]
+		imul	rcx, 8
+		sub	rax, rcx
+		mov	rcx, [rbp-16]
+		mov	[rcx--48], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-40]
+		mov	rcx, [rbp-16]
+		mov	rcx, [rcx-48]
+		mov	[rcx], rax
+		mov	rax, 1
+		mov	rcx, [rbp-16]
+		mov	[rcx--56], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-24]
+		mov	rcx, [rbp-16]
+		mov	rcx, [rcx-56]
+		add	rax, rcx
+		mov	rcx, [rbp-16]
+		mov	[rcx--64], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-64]
+		mov	rcx, [rbp-16]
+		mov	[rcx--24], rax
+		jmp	L8
+L9:
+L7:
+		leave	
+		ret	
+L12:			# CHECK
+		push	rbp
+		mov	rcx, rsp
+		push	[rbp-8]
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 64
+L14:
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-24]
+		mov	rcx, 1000
+		cmp	rax, rcx
+		jl	L17
+		mov	rax, 0
+		jmp	L18
+		L17:
+		mov	rax, 1
+		L18:
+		mov	rcx, [rbp-16]
+		mov	[rcx--32], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-32]
+		cmp	rax, 0
+		je	L15
+		mov	rcx, [rbp-8]
+		sub	rcx, 16
+		mov	rax, rcx
+		mov	rcx, [rbp-16]
+		mov	rcx, [rcx-24]
+		imul	rcx, 8
+		sub	rax, rcx
+		mov	rax, [rax]
+		mov	rcx, [rbp-16]
+		mov	[rcx--40], rax
+		mov	rax, 4625478292286210048
+		mov	rcx, [rbp-16]
+		mov	[rcx--48], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-40]
+		mov	rcx, [rbp-16]
+		mov	rcx, [rcx-48]
+		cmp	rax, rcx
+		jne	L19
+		mov	rax, 0
+		jmp	L20
+		L19:
+		mov	rax, 1
+		L20:
+		mov	rcx, [rbp-16]
+		mov	[rcx--56], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-56]
+		cmp	rax, 0
+		je	L16
+		mov	rax, 0
+		mov	rcx, [rbp-16]
+		mov	[rcx--64], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-64]
+		jmp	L13
+		mov	rax, 1
+		mov	rcx, [rbp-16]
+		mov	[rcx--72], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-24]
+		mov	rcx, [rbp-16]
+		mov	rcx, [rcx-72]
+		add	rax, rcx
+		mov	rcx, [rbp-16]
+		mov	[rcx--80], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-80]
+		mov	rcx, [rbp-16]
+		mov	[rcx--24], rax
+L16:
+		jmp	L14
+L15:
+L13:
+		leave	
+		ret	
+L21:			# ZERO
+		push	rbp
+		mov	rcx, rsp
+		push	[rbp-8]
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 8
+		mov	rax, 0
+		mov	rcx, [rbp-16]
+		mov	[rcx--24], rax
+		mov	rcx, [rbp-16]
+		mov	rax, [rcx-24]
+		jmp	L22
+L22:
+		leave	
+		ret	
+L3:			# PROGRAM
+		push	rbp
+		mov	rcx, rsp
+		push	rcx
+		mov	rbp, rcx
+		sub	rsp, 8032
+		mov	rax, 2
+		mov	rcx, [rbp-8]
+		mov	[rcx--8032], rax
+		mov	rcx, [rbp-8]
+		mov	rax, [rcx-8032]
+		push	rax
+		mov	rax, 2000
+		mov	rcx, [rbp-8]
+		mov	[rcx--8040], rax
+		mov	rcx, [rbp-8]
+		mov	rax, [rcx-8040]
+		push	rax
+		call	L4	# HALF
+		add	rsp, 16
+		mov	rcx, [rbp-8]
+		mov	[rcx--8024], rax
+		mov	rcx, [rbp-8]
+		mov	rax, [rcx-8024]
+		mov	rcx, [rbp-8]
+		mov	[rcx--8016], rax
+L23:
 		leave	
 		ret	

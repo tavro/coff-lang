@@ -62,6 +62,7 @@ typedef struct {
 #define T_CURLYRIGHT    294 // }
 #define T_CURLYLEFT     295 // {
 #define T_SUBPROG       296 // subprogram
+#define T_MAIN          297 // main
 
 #define NR_SYMBOLS      99
 

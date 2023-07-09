@@ -140,11 +140,11 @@ STR_ERR 	'([^'\n]|'')*\n
                 column += yyleng;
                 return T_NOTEQ;
             }
-(?i:do)		{
+(?i:main)	{
                 yylloc.first_line = yylineno;
                 yylloc.first_column = column;
                 column += yyleng;
-                return T_DO;
+                return T_MAIN;
 			}
 (?i:or)		{
                 yylloc.first_line = yylineno;

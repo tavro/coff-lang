@@ -91,12 +91,13 @@ extern int yydebug;
     T_RETURN = 292,                /* T_RETURN  */
     T_STRING = 293,                /* T_STRING  */
     T_SUBPROG = 294,               /* T_SUBPROG  */
-    T_ID = 295,                    /* T_ID  */
-    T_PROGRAM = 296,               /* T_PROGRAM  */
-    T_PROCEDURE = 297,             /* T_PROCEDURE  */
-    T_FUNCTION = 298,              /* T_FUNCTION  */
-    T_INT = 299,                   /* T_INT  */
-    T_REAL = 300                   /* T_REAL  */
+    T_MAIN = 295,                  /* T_MAIN  */
+    T_ID = 296,                    /* T_ID  */
+    T_PROGRAM = 297,               /* T_PROGRAM  */
+    T_PROCEDURE = 298,             /* T_PROCEDURE  */
+    T_FUNCTION = 299,              /* T_FUNCTION  */
+    T_INT = 300,                   /* T_INT  */
+    T_REAL = 301                   /* T_REAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -127,7 +128,7 @@ union YYSTYPE
     pool_index          str;
     pool_index          pool_p;
 
-#line 131 "./parser/parser.hh"
+#line 132 "./parser/parser.hh"
 
 };
 typedef union YYSTYPE YYSTYPE;
